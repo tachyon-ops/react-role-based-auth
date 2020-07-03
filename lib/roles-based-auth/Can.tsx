@@ -1,16 +1,24 @@
 import React, { ReactElement } from 'react';
 
-import { rules as rbacRules, Role } from './rbac-rules';
+import { rules as rbacRules, BaseRoles } from './rbac-rules';
 
+/**
+ * Types
+ */
 type Permission = { static?: string[]; dynamic?: { [key: string]: Function } };
-
-type RuleType = { [key in Role]: Permission };
-
+type RuleType<Role extends BaseRoles> = { [key in Role]: Permission };
 type PermissionActionType = string;
-
 type DataType = { [key: string]: string | DataType };
 
-const check = (rules: RuleType, role: Role, action: PermissionActionType, data: unknown): boolean => {
+/**
+ * Check function
+ */
+const check = <Role extends BaseRoles>(
+    rules: RuleType<Role>,
+    role: Role,
+    action: PermissionActionType,
+    data: unknown
+): boolean => {
     const permissions = rules[role];
     if (!permissions) {
         // role is not present in the rules
@@ -38,8 +46,11 @@ const check = (rules: RuleType, role: Role, action: PermissionActionType, data: 
     return false;
 };
 
+/**
+ * Can Component
+ */
 interface CanProps {
-    role: Role;
+    role: BaseRoles;
     perform: PermissionActionType;
     data?: DataType;
     yes?: () => ReactElement;

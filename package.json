@@ -1,6 +1,6 @@
 {
-    "name": "react-role-based-auth",
-    "version": "0.0.1",
+    "name": "react-rb-auth",
+    "version": "0.0.2",
     "description": "Simple Role Based Auth for react projects",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -30,6 +30,7 @@
         "@babel/preset-typescript": "^7.7.7",
         "@types/jest": "^24.0.25",
         "@types/node": "^13.1.4",
+        "@types/react": "^16.9.41",
         "babel-jest": "^24.9.0",
         "chai": "^4.2.0",
         "jest": "^24.9.0",
@@ -80,7 +81,8 @@
         "verbose": true
     },
     "dependencies": {
-        "redux": "^4.0.5",
-        "redux-thunk": "^2.3.0"
+        "@types/react-router-dom": "^5.1.5",
+        "react": "^16.13.1",
+        "react-router-dom": "^5.2.0"
     }
 }

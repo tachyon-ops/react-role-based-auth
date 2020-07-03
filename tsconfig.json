@@ -6,7 +6,9 @@
         "declaration": true,
         "outDir": "./dist",
         "strict": true,
-        "types": ["node", "jest"]
+        "types": ["node", "jest"],
+        "esModuleInterop": true,
+        "jsx": "react"
     },
     "exclude": ["test/**/*"]
 }
