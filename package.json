@@ -1,6 +1,6 @@
 {
     "name": "react-rb-auth",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "description": "Simple Role Based Auth for react projects",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
