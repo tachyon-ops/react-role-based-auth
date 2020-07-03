@@ -1,0 +1,86 @@
+{
+    "name": "react-role-based-auth",
+    "version": "0.0.1",
+    "description": "Simple Role Based Auth for react projects",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "rm -rf dist/ && tsc",
+        "prettier": "npx prettier --write lib/**/{*.ts,*.tsx,*.scss} test/**/{*.ts,*.tsx,*.scss}",
+        "test": "jest"
+    },
+    "keywords": [
+        "minimal",
+        "typescript",
+        "boilerplate"
+    ],
+    "author": "TachyonVFX, LDA <info@tachyonvfx.com>",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:nmpribeiro/react-role-based-auth.git"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/nmpribeiro/react-role-based-auth.git"
+    },
+    "homepage": "https://gitlab.com/nmpribeiro/react-role-based-auth/blob/master/README.md",
+    "devDependencies": {
+        "@babel/core": "^7.7.7",
+        "@babel/preset-env": "^7.7.7",
+        "@babel/preset-typescript": "^7.7.7",
+        "@types/jest": "^24.0.25",
+        "@types/node": "^13.1.4",
+        "babel-jest": "^24.9.0",
+        "chai": "^4.2.0",
+        "jest": "^24.9.0",
+        "mocha": "^7.0.0",
+        "prettier": "^1.19.1",
+        "typescript": "^3.7.4"
+    },
+    "jest": {
+        "collectCoverageFrom": [
+            "test/**/*.{js,jsx,ts,tsx}",
+            "!test/**/*.d.ts"
+        ],
+        "resolver": "jest-pnp-resolver",
+        "setupFiles": [],
+        "testMatch": [
+            "<rootDir>/test/**/*test.{js,jsx,ts,tsx}",
+            "<rootDir>/test/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+        ],
+        "testEnvironment": "jsdom",
+        "testURL": "http://localhost",
+        "transform": {
+            "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+            "^.+\\.css$": "<rootDir>/jest/cssTransform.js",
+            "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/jest/fileTransform.js"
+        },
+        "transformIgnorePatterns": [
+            "^.+\\.module\\.(css|sass|scss)$",
+            "[/\\\\]node_modules/(?!(@material)).+\\.js$"
+        ],
+        "moduleNameMapper": {
+            "^react-native$": "react-native-web",
+            "^.+\\.module\\.(css|sass|scss)$": "<rootDir>/jest/cssTransform.js"
+        },
+        "moduleFileExtensions": [
+            "web.js",
+            "js",
+            "web.ts",
+            "ts",
+            "web.tsx",
+            "tsx",
+            "json",
+            "web.jsx",
+            "jsx",
+            "node",
+            "png"
+        ],
+        "watchPlugins": [],
+        "verbose": true
+    },
+    "dependencies": {
+        "redux": "^4.0.5",
+        "redux-thunk": "^2.3.0"
+    }
+}
