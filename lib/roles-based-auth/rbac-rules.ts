@@ -1,12 +1,12 @@
-export type Role = 'admin' | 'visitor' | 'writer';
+export type BaseRoles = 'admin' | 'visitor';
 
 export type StaticRulesType = string[];
 export type DynamicRulesType = {
     [key: string]: (...args: any) => boolean;
 };
 
-export type RulesInterface<RoleType> = {
-    [key in Role]: {
+export type RulesInterface<RoleType extends string> = {
+    [key in RoleType]: {
         static?: StaticRulesType;
         dynamic?: DynamicRulesType;
     };
