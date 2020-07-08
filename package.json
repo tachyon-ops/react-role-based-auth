@@ -1,12 +1,12 @@
 {
   "name": "react-rb-auth",
-  "version": "1.0.1-rc0",
+  "version": "1.0.1-rc1",
   "description": "Simple Role Based Auth for react projects",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
+    "build": "rm -rf dist && tsc --build ./tsconfig.build.json && copyfiles -u 2 ./src/lib/**/*.html ./src/lib/**/*.css ./dist/",
     "demo": "node scripts/demo.js",
     "test": "node scripts/test.js"
   },
@@ -45,6 +45,7 @@
     "babel-preset-react-app": "^9.0.2",
     "camelcase": "^5.2.0",
     "case-sensitive-paths-webpack-plugin": "2.2.0",
+    "copyfiles": "^2.3.0",
     "css-loader": "2.1.1",
     "dotenv": "6.2.0",
     "dotenv-expand": "5.1.0",
