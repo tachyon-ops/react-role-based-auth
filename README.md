@@ -18,6 +18,104 @@ All library files are located inside **src/lib** folder.
 
 Inside **src/demo** folder, you can test your library while developing.
 
+## How to use
+
+### Context handling
+
+This library supplies you with a context to handle all Authentication state in the whole app for you. As such, you must create an `Auth` component using the following code as a guideline:
+
+```typescript
+import React, { useState } from 'react';
+import { getAuthContext } from 'react-rb-auth';
+
+import { UserModel } from '../models/user';
+
+export const AppAuthContext = getAuthContext<UserModel>();
+
+const regUser: UserModel = {
+  name: 'Registered user name',
+  role: 'admin',
+};
+const anonUser: UserModel = {
+  name: '',
+  role: 'visitor',
+};
+
+export const Auth: React.FC = ({ children }) => {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState<UserModel>(anonUser);
+
+  const initiateLogin = () => {
+    setAuthenticated(true);
+    setUser(regUser);
+  };
+  const logout = () => {
+    setAuthenticated(false);
+    setUser(anonUser);
+  };
+
+  return (
+    <AppAuthContext.Provider
+      value={{
+        authenticated,
+        reloading: false,
+        accessToken: 'is_it_an_access_token?',
+        initiateLogin,
+        handleAuthentication: () => null,
+        silentAuth: () => null,
+        logout,
+        routes: {
+          public: '/',
+          private: '/counter',
+        },
+        user,
+      }}
+    >
+      {children}
+    </AppAuthContext.Provider>
+  );
+};
+```
+
+In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }`, being `BaseRole` imported from `react-rb-auth` lib.
+
+Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
+
+```typescript
+ReactDOM.render(
+  <Provider store={store}>
+    <Auth>
+      <App />
+    </Auth>
+  </Provider>,
+  document.getElementById('root')
+);
+```
+
+Now you can use your context like so:
+
+```typescript
+<AppAuthContext.Consumer>
+  {(context) => (
+    <div>
+      {!context.authenticated && (
+        <>
+          <h3>You are anonymous</h3>
+          <button onClick={props.login}>Login</button>
+        </>
+      )}
+      {context.authenticated && (
+        <>
+          <h3>Welcome USER!</h3>
+          <p>Your name is: {context.user.name}</p>
+          <button onClick={props.logout}>Logout</button>
+        </>
+      )}
+    </div>
+  )}
+</AppAuthContext.Consumer>
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
