@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 
-import { rules as rbacRules, BaseRoles, RulesInterface } from './rbac-rules';
+import { RBAuthBaseRoles, RBAuthRulesInterface } from '..';
+import { rules as rbacRules } from './rbac-rules';
 
 /**
  * Types
@@ -11,8 +12,8 @@ type DataObject = { [key: string]: string | DataObject };
 /**
  * Check function
  */
-const check = <Role extends BaseRoles>(
-  rules: RulesInterface<Role>,
+const check = <Role extends RBAuthBaseRoles>(
+  rules: RBAuthRulesInterface<Role>,
   role: Role,
   action: PermissionActionType,
   data: DataObject
@@ -48,7 +49,7 @@ const check = <Role extends BaseRoles>(
  * Can Component
  */
 interface CanProps {
-  role: BaseRoles;
+  role: RBAuthBaseRoles;
   perform: PermissionActionType;
   data?: DataObject;
   yes?: () => ReactElement;

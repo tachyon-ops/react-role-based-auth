@@ -1,21 +1,22 @@
 import React from 'react';
-import { AppAuthContext } from '../services/Auth';
 
-const LoginLogout: React.FC<{ login: VoidFunction; logout: VoidFunction }> = (props) => (
+import { AppAuthContext } from '../services/AppAuthContext';
+
+const LoginLogout: React.FC = (props) => (
   <AppAuthContext.Consumer>
-    {(context) => (
+    {(authContext) => (
       <div>
-        {!context.authenticated && (
+        {!authContext.authenticated && (
           <div>
             <h3>You are anonymous</h3>
-            <button onClick={props.login}>Login</button>
+            <button onClick={authContext.login}>Login</button>
           </div>
         )}
-        {context.authenticated && (
+        {authContext.authenticated && (
           <div>
             <h3>Welcome USER!</h3>
-            <h5>Your name is: {context.user.name}</h5>
-            <button onClick={props.logout}>Logout</button>
+            <h5>Your name is: {authContext.user.name}</h5>
+            <button onClick={authContext.logout}>Logout</button>
           </div>
         )}
         <br />
