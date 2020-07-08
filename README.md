@@ -78,6 +78,14 @@ export const Auth: React.FC = ({ children }) => {
 ```
 
 In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }`, being `BaseRole` imported from `react-rb-auth` lib.
+`UserModel` must `InitialUserType<BaseRoles>`:
+
+```typescript
+export interface UserModel extends InitialUserType<BaseRoles> {
+  name: string;
+  role: 'admin' | 'visitor';
+}
+```
 
 Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
 
