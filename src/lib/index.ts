@@ -2,7 +2,7 @@ import { AuthCallback, BrowserRefresh, SecuredRoute } from './authServices';
 import { AuthContextType } from './roles-based-auth/context';
 import {
   Can,
-  AuthContext,
+  getAuthContext,
   InitialUserType,
   initialAuthContext,
   BaseRoles,
@@ -11,5 +11,5 @@ import {
   RulesInterface,
 } from './roles-based-auth';
 
-export { AuthCallback, BrowserRefresh, SecuredRoute, Can, AuthContext, initialAuthContext };
+export { AuthCallback, BrowserRefresh, SecuredRoute, Can, getAuthContext, initialAuthContext };
 export type { AuthContextType, InitialUserType, BaseRoles, StaticRulesType, DynamicRulesType, RulesInterface };
