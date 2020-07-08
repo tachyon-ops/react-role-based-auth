@@ -43,7 +43,7 @@ Publishes the library to NPM.
 
 [Adding Typescript support](https://gist.github.com/DimiMikadze/f25e1c5c70fa003953afd40fa9042517)
 
-## Wanna help?
+## Wanna help
 
 Just fork and do a PR :) I will add you to the colaborators list with a BIG thank you!
 

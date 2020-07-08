@@ -1,8 +1,9 @@
 import React from 'react';
-import Example from '../lib';
-import { SecondExample } from '../lib';
 
-const App = () => (
+import Example from './components/Example';
+import SecondExample from './components/SecondExample';
+
+const App: React.FC = () => (
   <div>
     <Example />
     <SecondExample />
