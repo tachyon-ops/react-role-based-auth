@@ -1,5 +1,5 @@
 import React from 'react';
-import { AuthContext } from './roles-based-auth/context';
+import { AuthContext, getInitialAuthContext } from './roles-based-auth/context';
 import { AuthCallback } from './authServices/AuthCallback';
 import { BrowserRefresh } from './authServices/BrowserRefresh';
 import { SecuredRoute } from './authServices/SecureRoute';
@@ -43,11 +43,12 @@ export type RBAuthContextType<TUser extends RBAuthUser> = {
   };
 };
 
-export type RBAuthReactContext = React.Context<RBAuthContextType<RBAuthUser>>;
+export type RBAuthReactContext = React.Context<RBAuthContextType<any>>;
 
 export {
   // Roles Based Auth
   AuthContext,
+  getInitialAuthContext,
   // AuthServices
   AuthCallback,
   BrowserRefresh,
