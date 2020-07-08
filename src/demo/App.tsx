@@ -1,36 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Switch, BrowserRouter, Link } from 'react-router-dom';
 
 import Example from './components/Example';
 import SecondExample from './components/SecondExample';
-import { Auth } from './services/Auth';
 import LoginLogout from './components/LoginLogout';
-import { UserModel } from './models/user';
+import Auth from './services/Auth';
+import { SecuredRoute, RBAuthReactContext } from '../lib';
+import { AppAuthContext } from './services/AppAuthContext';
 
-const anonUser: UserModel = { name: '', role: 'visitor' };
-const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };
+const App: React.FC = () => (
+  <BrowserRouter>
+    <Auth>
+      <Example />
 
-const App: React.FC = () => {
-  const [auth, setAuth] = useState(false);
-  const [user, setUser] = useState<UserModel>(anonUser);
-  const login = () => {
-    setAuth(true);
-    setUser(regUser);
-  };
-  const logout = () => {
-    setAuth(false);
-    setUser(anonUser);
-  };
-  useEffect(() => {
-    console.log('user: ', user, 'auth: ', auth);
-  }, [auth, user]);
-  return (
-    <Auth authenticated={auth} user={user}>
-      <Example>
-        <LoginLogout login={login} logout={logout} />
-      </Example>
+      <div className="Example">
+        <Link to="/">Home</Link> <Link to="/secure">Secure</Link> <Link to="/super-secure">Super Secure</Link>
+        <Switch>
+          <SecuredRoute
+            AuthContext={(AppAuthContext as unknown) as RBAuthReactContext}
+            path="/secure"
+            Comp={() => <h3>Secure area</h3>}
+            NotAllowed={() => <h3>You are not allowed</h3>}
+          />
+
+          <SecuredRoute
+            AuthContext={(AppAuthContext as unknown) as RBAuthReactContext}
+            path="/super-secure"
+            Comp={() => <h3>Super Secure area</h3>}
+          />
+        </Switch>
+        <LoginLogout />
+      </div>
+
       <SecondExample />
     </Auth>
-  );
-};
+  </BrowserRouter>
+);
 
 export default App;

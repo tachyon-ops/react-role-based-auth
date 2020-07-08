@@ -1,6 +1,8 @@
-import { InitialUserType, BaseRoles } from '../../lib';
+import { RBAuthUser } from '../../lib';
 
-export interface UserModel extends InitialUserType<BaseRoles> {
+export interface UserModel extends RBAuthUser {
   name: string;
-  role: 'admin' | 'visitor';
 }
+
+export const anonUser: UserModel = { name: '', role: 'visitor' };
+export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };

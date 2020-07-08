@@ -25,66 +25,72 @@ Inside **src/demo** folder, you can test your library while developing.
 This library supplies you with a context to handle all Authentication state in the whole app for you. As such, you must create an `Auth` component using the following code as a guideline:
 
 ```typescript
-import React, { useState } from 'react';
-import { getAuthContext } from 'react-rb-auth';
+import { createContext } from 'react';
+import { getInitialAuthContext } from 'react-rb-auth';
 
-import { UserModel } from '../models/user';
+import { UserModel, anonUser } from '../models/user';
 
-export const AppAuthContext = getAuthContext<UserModel>();
-
-const regUser: UserModel = {
-  name: 'Registered user name',
-  role: 'admin',
-};
-const anonUser: UserModel = {
-  name: '',
-  role: 'visitor',
-};
-
-export const Auth: React.FC = ({ children }) => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [user, setUser] = useState<UserModel>(anonUser);
-
-  const initiateLogin = () => {
-    setAuthenticated(true);
-    setUser(regUser);
-  };
-  const logout = () => {
-    setAuthenticated(false);
-    setUser(anonUser);
-  };
-
-  return (
-    <AppAuthContext.Provider
-      value={{
-        authenticated,
-        reloading: false,
-        accessToken: 'is_it_an_access_token?',
-        initiateLogin,
-        handleAuthentication: () => null,
-        silentAuth: () => null,
-        logout,
-        routes: {
-          public: '/',
-          private: '/counter',
-        },
-        user,
-      }}
-    >
-      {children}
-    </AppAuthContext.Provider>
-  );
-};
+export const AppAuthContext = createContext(getInitialAuthContext<UserModel>(anonUser));
 ```
+
+#### User model
 
 In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }`, being `BaseRole` imported from `react-rb-auth` lib.
 `UserModel` must `InitialUserType<BaseRoles>`:
 
 ```typescript
-export interface UserModel extends InitialUserType<BaseRoles> {
+import { RBAuthUser } from 'react-rb-auth';
+
+export interface UserModel extends RBAuthUser {
   name: string;
-  role: 'admin' | 'visitor';
 }
+
+export const anonUser: UserModel = { name: '', role: 'visitor' };
+export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };
+```
+
+#### Your Auth class
+
+This library can't know your `UserModel` nor how your backend expects auth to work out, so you will have to create a class for all your `Auth` logic:
+
+```typescript
+import React, { useState } from 'react';
+
+import { UserModel, anonUser, regUser } from '../models/user';
+import { AppAuthContext } from './AppAuthContext';
+
+const Auth: React.FC = ({ children }) => {
+  const [authenticated, setAuth] = useState(false);
+  const [user, setUser] = useState<UserModel>(anonUser);
+
+  const login = () => {
+    setAuth(true);
+    setUser(regUser);
+  };
+  const logout = () => {
+    setAuth(false);
+    setUser(anonUser);
+  };
+
+  const setupAuthVal = () => ({
+    authenticated,
+    reloading: false,
+    accessToken: 'is_it_an_access_token?',
+    login: login,
+    logout: logout,
+    handleAuthentication: () => null,
+    silentAuth: () => null,
+    routes: {
+      public: '/',
+      private: '/admin',
+    },
+    user,
+  });
+
+  return <AppAuthContext.Provider value={setupAuthVal()}>{children}</AppAuthContext.Provider>;
+};
+
+export default Auth;
 ```
 
 Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
@@ -100,29 +106,41 @@ ReactDOM.render(
 );
 ```
 
-Now you can use your context like so:
+Now you can use your context like follows, where we combined everything to let you see that even access to `login` and `logout` functionality is in the context.
 
 ```typescript
-<AppAuthContext.Consumer>
-  {(context) => (
-    <div>
-      {!context.authenticated && (
-        <>
-          <h3>You are anonymous</h3>
-          <button onClick={props.login}>Login</button>
-        </>
-      )}
-      {context.authenticated && (
-        <>
-          <h3>Welcome USER!</h3>
-          <p>Your name is: {context.user.name}</p>
-          <button onClick={props.logout}>Logout</button>
-        </>
-      )}
-    </div>
-  )}
-</AppAuthContext.Consumer>
+import React from 'react';
+
+import { AppAuthContext } from '../services/AppAuthContext';
+
+export const LoginLogout: React.FC = (props) => (
+  <AppAuthContext.Consumer>
+    {(authContext) => (
+      <div>
+        {!authContext.authenticated && (
+          <div>
+            <h3>You are anonymous</h3>
+            <button onClick={authContext.login}>Login</button>
+          </div>
+        )}
+        {authContext.authenticated && (
+          <div>
+            <h3>Welcome USER!</h3>
+            <h5>Your name is: {authContext.user.name}</h5>
+            <button onClick={authContext.logout}>Logout</button>
+          </div>
+        )}
+        <br />
+        <br />
+      </div>
+    )}
+  </AppAuthContext.Consumer>
+);
 ```
+
+## Roles
+
+- TODO
 
 ## Available Scripts
 

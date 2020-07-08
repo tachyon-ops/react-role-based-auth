@@ -1,18 +1,27 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-import { getAuthContext } from '../roles-based-auth/context';
+import { RBAuthReactContext } from '..';
 
-export const SecuredRoute: React.FC<{ component: React.FC; path: string }> = ({ component, path }) => {
-  const authContext = useContext(getAuthContext());
-  const Component = component;
-  return (
-    <Route
-      path={path}
-      render={() => {
-        if (!authContext.authenticated) return <Redirect to={authContext.routes.public} />;
-        return <Component />;
-      }}
-    />
-  );
-};
+interface Props {
+  AuthContext: RBAuthReactContext;
+  path: string;
+  Comp: React.FC;
+  NotAllowed?: React.FC;
+}
+export const SecuredRoute: React.FC<Props> = ({ AuthContext, Comp, path, NotAllowed }) => (
+  <AuthContext.Consumer>
+    {(authContext) => (
+      <Route
+        path={path}
+        render={() => {
+          if (!authContext.authenticated) {
+            if (NotAllowed) return <NotAllowed />;
+            return <Redirect to={authContext.routes.public} />;
+          }
+          return <Comp />;
+        }}
+      />
+    )}
+  </AuthContext.Consumer>
+);

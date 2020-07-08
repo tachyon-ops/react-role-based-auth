@@ -1,23 +1,9 @@
-/**
- * Types
- */
-export type BaseRoles = 'admin' | 'visitor';
-export type StaticRulesType = string[];
-export type DynamicRulesType = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: (...args: any) => boolean;
-};
-export type RulesInterface<RoleType extends string> = {
-  [key in RoleType]: {
-    static?: StaticRulesType;
-    dynamic?: DynamicRulesType;
-  };
-};
+import { RBAuthRulesInterface } from '..';
 
 /**
  * Example:
  */
-export const rules: RulesInterface<'admin' | 'visitor' | 'writer'> = {
+export const rules: RBAuthRulesInterface<'admin' | 'visitor' | 'writer'> = {
   visitor: {
     static: [
       // visitor permissions

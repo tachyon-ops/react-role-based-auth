@@ -1,31 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { getAuthContext } from '../../lib';
-import { UserModel } from '../models/user';
+import { UserModel, anonUser, regUser } from '../models/user';
+import { AppAuthContext } from './AppAuthContext';
 
-export const AppAuthContext = getAuthContext<UserModel>();
+const Auth: React.FC = ({ children }) => {
+  const [authenticated, setAuth] = useState(false);
+  const [user, setUser] = useState<UserModel>(anonUser);
 
-export const Auth: React.FC<{ authenticated: boolean; user: UserModel }> = ({
-  children,
-  authenticated = false,
-  user = { name: '', role: 'visitor' },
-}) => (
-  <AppAuthContext.Provider
-    value={{
-      authenticated,
-      reloading: false,
-      accessToken: 'is_it_an_access_token?',
-      initiateLogin: () => null,
-      handleAuthentication: () => null,
-      silentAuth: () => null,
-      logout: () => null,
-      routes: {
-        public: '/',
-        private: '/admin',
-      },
-      user,
-    }}
-  >
-    {children}
-  </AppAuthContext.Provider>
-);
+  const login = () => {
+    setAuth(true);
+    setUser(regUser);
+  };
+  const logout = () => {
+    setAuth(false);
+    setUser(anonUser);
+  };
+
+  const setupAuthVal = () => ({
+    authenticated,
+    reloading: false,
+    accessToken: 'is_it_an_access_token?',
+    login: login,
+    logout: logout,
+    handleAuthentication: () => null,
+    silentAuth: () => null,
+    routes: {
+      public: '/',
+      private: '/admin',
+    },
+    user,
+  });
+
+  return <AppAuthContext.Provider value={setupAuthVal()}>{children}</AppAuthContext.Provider>;
+};
+
+export default Auth;

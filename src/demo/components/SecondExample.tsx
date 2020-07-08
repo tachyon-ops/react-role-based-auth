@@ -18,7 +18,7 @@ const SecondExample: React.FC = (props) => (
       className="SecondExample-github-link"
       target="_blank"
       rel="noopener noreferrer"
-      href="https://github.com/dimimikadze/create-react-library"
+      href="https://github.com/nmpribeiro/react-role-based-auth/blob/master/README.md"
     >
       Documentation
     </a>
