@@ -22,32 +22,7 @@ Inside **src/demo** folder, you can test your library while developing.
 
 ### Context handling
 
-This library supplies you with a context to handle all Authentication state in the whole app for you. As such, you must create an `Auth` component using the following code as a guideline:
-
-```typescript
-import { createContext } from 'react';
-import { getInitialAuthContext } from 'react-rb-auth';
-
-import { UserModel, anonUser } from '../models/user';
-
-export const AppAuthContext = createContext(getInitialAuthContext<UserModel>(anonUser));
-```
-
-#### User model
-
-In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }`, being `BaseRole` imported from `react-rb-auth` lib.
-`UserModel` must `InitialUserType<BaseRoles>`:
-
-```typescript
-import { RBAuthUser } from 'react-rb-auth';
-
-export interface UserModel extends RBAuthUser {
-  name: string;
-}
-
-export const anonUser: UserModel = { name: '', role: 'visitor' };
-export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };
-```
+This library supplies you with a context to handle all Authentication state in the whole app for you. You will need to construct an AuthClass where you manage all your Authentication logic.
 
 #### Your Auth class
 
@@ -93,6 +68,8 @@ const Auth: React.FC = ({ children }) => {
 export default Auth;
 ```
 
+`BrowserRefresh` logic can be seen on the accompaning `src/demo` sample App.
+
 Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
 
 ```typescript
@@ -104,6 +81,32 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 );
+```
+
+#### User model
+
+But wait, the context `AuthContext` from `import { AuthContext } from 'react-rb-auth';` has no idea about your `UserModel`, so whenever you want to reach your user attributes throughout your codebase, provided `Auth` has been introduced in the DOM tree (usually under your redux store provider), you will need to have the following type casted onto a "custom" `AppAuthContext` of your own:
+
+```typescript
+import { AuthContext, RBAuthContextType } from 'react-rb-auth';
+import { UserModel } from '../models/user';
+
+export const AppAuthContext = AuthContext as React.Context<RBAuthContextType<UserModel>>;
+```
+
+In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }` (notice the extra `name` in the Object), being `RBAuthUserModel` imported from `react-rb-auth` lib.
+
+TODO Note: extending 'roles' to be done.
+
+```typescript
+import { RBAuthUserModel } from 'react-rb-auth';
+
+export interface UserModel extends RBAuthUserModel {
+  name: string;
+}
+
+export const anonUser: UserModel = { name: '', role: 'visitor' };
+export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };
 ```
 
 Now you can use your context like follows, where we combined everything to let you see that even access to `login` and `logout` functionality is in the context.
