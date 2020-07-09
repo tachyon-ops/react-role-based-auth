@@ -1,6 +1,6 @@
 # React Role Based Auth
 
-Role based auth for redux
+Role based auth for redux. Have a look here: [react-rb-auth.herokuapp.com](https://react-rb-auth.herokuapp.com/) - on browser refresh, you'll be logged in automatically (it's just a boolean :bowtie: )
 
 ## Usage
 

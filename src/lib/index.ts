@@ -26,6 +26,7 @@ export type RBAuthRulesInterface<RoleType extends string> = {
 interface UserModelWithRole {
   role: RBAuthBaseRoles;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RBAuthUserModel = any & UserModelWithRole;
 
 // Auth Context type
