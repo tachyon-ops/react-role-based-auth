@@ -170,9 +170,13 @@ Publishes the library to NPM.
 
 [Adding Typescript support](https://gist.github.com/DimiMikadze/f25e1c5c70fa003953afd40fa9042517)
 
-## Wanna help
+## I want to help
+
+### Help with work
 
 Just fork and do a PR :) I will add you to the colaborators list with a BIG thank you!
+
+- If you want to buy me a coffee or a beer as a thank you, I'm very much appreciated :stuck_out_tongue_winking_eye: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D3J2WXTXLAWK8&source=url)
 
 ### Guidelines
 
