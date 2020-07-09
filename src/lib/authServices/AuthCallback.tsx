@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 
-import { AuthContext } from '../roles-based-auth/context';
+import { AuthContext } from '..';
 
 interface Props {
   location: { hash: string };

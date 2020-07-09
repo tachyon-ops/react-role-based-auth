@@ -1,11 +1,11 @@
 import { createContext } from 'react';
-import { RBAuthContextType, RBAuthUser } from '..';
+import { RBAuthContextType, RBAuthUserModel } from '..';
 
-export const getInitialAuthContext = <U extends RBAuthUser>(user: U): RBAuthContextType<U> => ({
+export const AuthContext = createContext<RBAuthContextType<RBAuthUserModel>>({
   authenticated: false, // to check if authenticated or not
   reloading: true,
   // store all the user details
-  user: (user || { role: 'visitor' }) as U,
+  user: { role: 'visitor' },
   accessToken: '', // accessToken of user for Auth0
   login: () => console.log('please change initialteLogin'), // to start the login process
   logout: () => console.log('please change logout'), // logout the user
@@ -16,7 +16,3 @@ export const getInitialAuthContext = <U extends RBAuthUser>(user: U): RBAuthCont
     private: '/dashboard',
   },
 });
-
-export const AuthContext = createContext(
-  getInitialAuthContext<RBAuthUser>({ role: 'visitor' })
-);

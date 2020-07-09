@@ -1,6 +1,5 @@
-import { createContext } from 'react';
-import { getInitialAuthContext } from '../../lib/roles-based-auth/context';
+import { AuthContext } from '../../lib';
+import { RBAuthContextType } from '../../lib/index';
+import { UserModel } from '../models/user';
 
-import { UserModel, anonUser } from '../models/user';
-
-export const AppAuthContext = createContext(getInitialAuthContext<UserModel>(anonUser));
+export const AppAuthContext = AuthContext as React.Context<RBAuthContextType<UserModel>>;

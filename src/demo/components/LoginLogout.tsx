@@ -5,7 +5,7 @@ import { AppAuthContext } from '../services/AppAuthContext';
 const LoginLogout: React.FC = (props) => (
   <AppAuthContext.Consumer>
     {(authContext) => (
-      <div>
+      <>
         {!authContext.authenticated && (
           <div>
             <h3>You are anonymous</h3>
@@ -21,7 +21,7 @@ const LoginLogout: React.FC = (props) => (
         )}
         <br />
         <br />
-      </div>
+      </>
     )}
   </AppAuthContext.Consumer>
 );

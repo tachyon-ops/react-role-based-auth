@@ -1,6 +1,6 @@
-import { RBAuthUser } from '../../lib';
+import { RBAuthUserModel } from '../../lib';
 
-export interface UserModel extends RBAuthUser {
+export interface UserModel extends RBAuthUserModel {
   name: string;
 }
 
