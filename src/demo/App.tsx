@@ -1,10 +1,10 @@
 import React from 'react';
 import { Switch, BrowserRouter, Link } from 'react-router-dom';
 
-import Example from './components/Example';
-import SecondExample from './components/SecondExample';
-import LoginLogout from './components/LoginLogout';
-import Auth from './services/Auth';
+import { Example } from './components/Example';
+import { SecondExample } from './components/SecondExample';
+import { LoginLogout } from './components/LoginLogout';
+import { Auth } from './services/Auth';
 import { SecuredRoute, BrowserRefresh } from '../lib';
 
 const Reloading: React.FC = () => (
