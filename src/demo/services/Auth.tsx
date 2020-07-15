@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthContext } from '../../lib';
+import { AuthContext } from 'react-rb-auth';
 
 import { UserModel, anonUser } from '../models/user';
 import { rules } from '../models/rules';

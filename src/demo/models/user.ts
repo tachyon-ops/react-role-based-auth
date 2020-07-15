@@ -1,4 +1,4 @@
-import { RBAuthBaseRoles, UserModelWithRole } from '../../lib';
+import { RBAuthBaseRoles, UserModelWithRole } from 'react-rb-auth';
 
 // type AppRoles = RBAuthBaseRoles | 'editor';
 type AppRoles = RBAuthBaseRoles | 'editor';

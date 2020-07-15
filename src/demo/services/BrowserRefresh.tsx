@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-
-import { RefreshApp } from '../../lib';
+import { RefreshApp } from 'react-rb-auth';
 
 export const BrowserRefresh: React.FC<{
   AuthReloadingComp: React.FC;

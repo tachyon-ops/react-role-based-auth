@@ -1,4 +1,4 @@
-import { RBAuthRulesInterface } from '../../lib';
+import { RBAuthRulesInterface } from 'react-rb-auth';
 
 import { AppRole } from './role';
 

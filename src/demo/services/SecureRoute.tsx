@@ -1,7 +1,6 @@
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
-
-import { SecureScreen, RBAuthRedirect } from '../../lib';
+import { SecureScreen, RBAuthRedirect } from 'react-rb-auth';
 
 /**
  * AppRedirect

@@ -1,4 +1,4 @@
-import { AuthContext, RBAuthReactContext } from '../../lib';
+import { AuthContext, RBAuthReactContext } from 'react-rb-auth';
 
 import { UserModel } from '../models/user';
 import { rules } from '../models/rules';
