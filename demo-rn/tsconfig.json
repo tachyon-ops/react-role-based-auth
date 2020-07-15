@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "react-rb-auth": ["../src/lib"]
+    }
+  }
+}
