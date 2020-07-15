@@ -13,6 +13,8 @@
 /dist
 /demo
 /demo-rn/node_modules
+demo-rn/.vscode/
+demo-rn/.expo/
 
 # misc
 .DS_Store
