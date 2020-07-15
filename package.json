@@ -8,6 +8,7 @@
     "start": "node scripts/start.js",
     "build": "rm -rf dist && tsc --build ./tsconfig.build.json && copyfiles -u 2 ./src/lib/**/*.html ./src/lib/**/*.css ./dist/",
     "demo": "node scripts/demo.js",
+    "demo-rn": "yarn --cwd example",
     "test": "node scripts/test.js"
   },
   "license": "MIT",

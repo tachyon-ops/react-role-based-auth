@@ -1,0 +1,22 @@
+{
+  "name": "react-rb-auth",
+  "displayName": "RN Role Based Auth",
+  "expo": {
+    "name": "react-rb-auth",
+    "slug": "react-rb-auth",
+    "description": "Example app for Role Based Auth for react projects",
+    "privacy": "public",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
