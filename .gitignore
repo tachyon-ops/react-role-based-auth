@@ -12,7 +12,7 @@
 /build
 /dist
 /demo
-/src/demo-rn/node_modules
+/demo-rn/node_modules
 
 # misc
 .DS_Store

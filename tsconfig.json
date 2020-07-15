@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "noImplicitAny": false,
     "strictNullChecks": false,
     "noImplicitReturns": true,
@@ -21,6 +21,10 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noImplicitThis": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "baseUrl": ".",
     "paths": {
       "react-rb-auth": ["./src/lib"]

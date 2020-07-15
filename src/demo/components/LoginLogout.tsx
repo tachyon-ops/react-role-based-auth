@@ -3,7 +3,7 @@ import React from 'react';
 import { AppAuthContext } from '../services/AppAuthContext';
 import { regUser, editorUser } from '../models/user';
 
-export const LoginLogout: React.FC = (props) => (
+export const LoginLogout: React.FC = () => (
   <AppAuthContext.Consumer>
     {(authContext) => (
       <>

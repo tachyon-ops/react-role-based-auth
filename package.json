@@ -4,11 +4,12 @@
   "description": "Simple Role Based Auth for react projects",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "source": "src/lib",
   "scripts": {
     "start": "node scripts/start.js",
     "build": "rm -rf dist && tsc --build ./tsconfig.build.json && copyfiles -u 2 ./src/lib/**/*.html ./src/lib/**/*.css ./dist/",
     "demo": "node scripts/demo.js",
-    "demo-rn": "yarn --cwd example",
+    "demo-rn": "yarn --cwd demo-nr",
     "test": "node scripts/test.js"
   },
   "license": "MIT",
@@ -39,6 +40,7 @@
     "babel-eslint": "10.0.3",
     "babel-jest": "^24.9.0",
     "babel-loader": "8.0.6",
+    "babel-plugin-module-resolver": "^4.0.0",
     "babel-plugin-named-asset-import": "^0.3.4",
     "babel-preset-react-app": "^9.0.2",
     "camelcase": "^5.2.0",
@@ -90,17 +92,6 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-manifest-plugin": "2.1.1",
     "workbox-webpack-plugin": "4.3.1"
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "extends": [
-      "react-app",
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
-    ]
   },
   "browserslist": {
     "production": [
@@ -168,5 +159,8 @@
     "tabWidth": 2,
     "trailingComma": "es5",
     "useTabs": false
+  },
+  "peerDependencies": {
+    "react": "*"
   }
 }
