@@ -1,16 +1,25 @@
-import React from 'react';
+import type React from 'react';
+
 import { AuthContext } from './roles-based-auth/context';
 import { AuthCallback } from './authServices/AuthCallback';
-import { BrowserRefresh } from './authServices/BrowserRefresh';
-import { SecuredRoute } from './authServices/SecureRoute';
+import { RefreshApp } from './authServices/RefreshApp';
+import { SecureScreen } from './authServices/SecureScreen';
 
 /**
- * Roles and Rules Types
+ * SecureRoute Types
+ */
+export type RBAuthRedirect = React.FC<{ to: string }>;
+
+/**
+ * Roles Types
  */
 export type RBAuthBaseRoles = 'admin' | 'public';
-export type RBAuthGenericRoles<T extends string> = 'admin' | 'public' | T;
-export type RBAuthStaticRulesType = string[];
-export type RBAuthDynamicRulesType = {
+
+/**
+ * Rule Types
+ */
+type RBAuthStaticRulesType = string[];
+type RBAuthDynamicRulesType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: (...args: any) => boolean;
 };
@@ -22,14 +31,16 @@ export type RBAuthRulesInterface<RoleType extends string> = {
 };
 
 /**
- * Context types
+ * User types
  */
+type RBAuthGenericRoles<T extends string> = 'admin' | 'public' | T;
 export interface UserModelWithRole<T extends string = RBAuthBaseRoles> {
   role: RBAuthGenericRoles<T>;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export type RBAuthUserModel<T extends string = ''> = RBAuthGenericRoles<T>;
 
+/**
+ * Context types
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LoginFunctionType = (...args: any[]) => void;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +81,6 @@ export {
   AuthContext,
   // AuthServices
   AuthCallback,
-  BrowserRefresh,
-  SecuredRoute,
+  RefreshApp,
+  SecureScreen,
 };

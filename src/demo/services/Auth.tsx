@@ -42,7 +42,7 @@ export const Auth: React.FC = ({ children }) => {
     }
   };
 
-  const setupAuthVal = () => ({
+  const contextVal = {
     authenticated,
     reloading,
     accessToken: 'is_it_an_access_token?',
@@ -56,7 +56,7 @@ export const Auth: React.FC = ({ children }) => {
     },
     user,
     rules,
-  });
+  };
 
-  return <AuthContext.Provider value={setupAuthVal()}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={contextVal}>{children}</AuthContext.Provider>;
 };
