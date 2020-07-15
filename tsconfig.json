@@ -20,7 +20,11 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "baseUrl": ".",
+    "paths": {
+      "react-rb-auth": ["./src/lib"]
+    }
   },
   "include": ["src"]
 }
