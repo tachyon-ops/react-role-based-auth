@@ -2,8 +2,11 @@ import React, { useEffect } from 'react';
 import { AuthContext, RBAuthContextType } from 'react-rb-auth';
 
 export const Auth: React.FC = ({ children }) => {
-  const [authenticated] = React.useState(false);
+  const [authenticated, setAuthenticated] = React.useState(false);
   const [reloading, setReloading] = React.useState(true);
+
+  const login = () => setAuthenticated(true);
+  const logout = () => setAuthenticated(false);
 
   useEffect(() => {
     setReloading(true);
@@ -14,13 +17,13 @@ export const Auth: React.FC = ({ children }) => {
     authenticated,
     reloading,
     accessToken: 'is_it_an_access_token?',
-    login: () => null,
-    logout: () => null,
+    login,
+    logout,
     handleAuthentication: () => null,
     silentAuth: () => null,
     routes: {
-      public: '/',
-      private: '/admin',
+      public: 'Home',
+      private: 'Admin',
     },
     user: { role: 'public' },
     rules: {
