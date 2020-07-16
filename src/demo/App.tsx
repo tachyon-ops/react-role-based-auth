@@ -1,11 +1,12 @@
 import React from 'react';
 import { Switch, BrowserRouter, Link } from 'react-router-dom';
 
-import Example from './components/Example';
-import SecondExample from './components/SecondExample';
-import LoginLogout from './components/LoginLogout';
-import Auth from './services/Auth';
-import { SecuredRoute, BrowserRefresh } from '../lib';
+import { Example } from './components/Example';
+import { SecondExample } from './components/SecondExample';
+import { LoginLogout } from './components/LoginLogout';
+import { Auth } from './services/Auth';
+import { BrowserRefresh } from './services/BrowserRefresh';
+import { SecureRoute } from './services/SecureRoute';
 
 const Reloading: React.FC = () => (
   <div>
@@ -35,13 +36,13 @@ const App: React.FC = () => (
         </AppMenu>
         <BrowserRefresh AuthReloadingComp={Reloading}>
           <Switch>
-            <SecuredRoute
+            <SecureRoute
               path="/secure"
               Allowed={() => <h3>Secure area</h3>}
               NotAllowed={() => <h3>You are not allowed</h3>}
             />
 
-            <SecuredRoute path="/super-secure" Allowed={() => <h3>Super Secure area</h3>} />
+            <SecureRoute path="/super-secure" Allowed={() => <h3>Super Secure area</h3>} />
           </Switch>
           <LoginLogout />
         </BrowserRefresh>

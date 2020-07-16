@@ -1,4 +1,6 @@
-import { AuthContext, RBAuthContextType } from '../../lib/index';
-import { UserModel } from '../models/user';
+import { AuthContext, RBAuthReactContext } from 'react-rb-auth';
 
-export const AppAuthContext = AuthContext as React.Context<RBAuthContextType<UserModel>>;
+import { UserModel } from '../models/user';
+import { rules } from '../models/rules';
+
+export const AppAuthContext = AuthContext as RBAuthReactContext<UserModel, typeof rules>;

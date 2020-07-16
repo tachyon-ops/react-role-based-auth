@@ -1,19 +1,24 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 
-import { AuthContext } from '..';
+import { AuthContext, RBAuthRedirect } from '..';
 
+/**
+ * TODO: test this component with something like Auth0
+ */
 interface Props {
-  location: { hash: string };
-  redirect?: boolean;
+  locationHash: string;
+  Redirect?: null | RBAuthRedirect;
 }
-export const AuthCallback: React.FC<Props> = (props) => (
+export const AuthCallback: React.FC<Props> = ({ children, locationHash, Redirect }) => (
   <AuthContext.Consumer>
     {(authContext) => {
-      if (/access_token|id_token|error/.test(props.location.hash)) authContext.handleAuthentication();
-      if (props.redirect) return <Redirect to={authContext.routes.public} />;
+      if (/access_token|id_token|error/.test(locationHash)) {
+        authContext.handleAuthentication();
+        return <></>;
+      }
+      if (Redirect) return <Redirect to={authContext.routes.public} />;
       else console.log('AuthCallback has no redirect, be sure handleAuthentication has programatic redirection');
-      return <>{props.children}</>;
+      return <>{children}</>;
     }}
   </AuthContext.Consumer>
 );

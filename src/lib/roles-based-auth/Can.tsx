@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 
-import { RBAuthBaseRoles, RBAuthRulesInterface } from '..';
-import { rules as rbacRules } from './rbac-rules';
+import type { RBAuthBaseRoles, RBAuthRulesInterface } from '..';
+import { AuthContext } from './context';
 
 /**
  * Types
@@ -19,27 +19,16 @@ const check = <Role extends RBAuthBaseRoles>(
   data: DataObject
 ): boolean => {
   const permissions = rules[role];
-  if (!permissions) {
-    // role is not present in the rules
-    return false;
-  }
+  // role is not present in the rules
+  if (!permissions) return false;
 
-  const staticPermissions = permissions.static;
+  // static rule not provided for action
+  if (permissions.static && permissions.static.includes(action)) return true;
 
-  if (staticPermissions && staticPermissions.includes(action)) {
-    // static rule not provided for action
-    return true;
-  }
-
-  const dynamicPermissions = permissions.dynamic;
-
-  if (dynamicPermissions) {
-    const permissionCondition = dynamicPermissions[action];
-    if (!permissionCondition) {
-      // dynamic rule not provided for action
-      return false;
-    }
-
+  if (permissions.dynamic) {
+    const permissionCondition = permissions.dynamic[action];
+    // dynamic rule not provided for action
+    if (!permissionCondition) return false;
     return permissionCondition(data);
   }
   return false;
@@ -55,6 +44,6 @@ interface CanProps {
   yes?: () => ReactElement;
   no?: () => ReactElement;
 }
-export const Can: React.FC<CanProps> = ({ role, perform, data = {}, yes = () => null, no = () => null }) => {
-  return check(rbacRules, role, perform, data) ? yes() : no();
-};
+export const Can: React.FC<CanProps> = ({ role, perform, data = {}, yes = () => null, no = () => null }) => (
+  <AuthContext.Consumer>{({ rules }) => (check(rules, role, perform, data) ? yes() : no())}</AuthContext.Consumer>
+);

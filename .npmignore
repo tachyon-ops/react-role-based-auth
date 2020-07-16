@@ -21,6 +21,7 @@ src
 scripts
 config
 demo
+demo-rn
 CHANGELOG.md
 README.md
 UPGRADE.md
