@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 
 import type { RBAuthBaseRoles, RBAuthRulesInterface } from '..';
 
-import { AuthContext } from './context';
+import { AuthContext } from '../roles-based-auth/context';
 
 /**
  * Types

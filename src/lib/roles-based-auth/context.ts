@@ -1,15 +1,24 @@
 import { createContext } from 'react';
 
-import { RBAuthContextType, RBAuthReactContext } from '..';
+import {
+  RBAuthContextType,
+  RBAuthReactContext,
+  RBAuthUserModelWithRole,
+  RBAuthBaseRoles,
+} from '..';
+
+export const RBAuthInitialUser: RBAuthUserModelWithRole<RBAuthBaseRoles> = {
+  role: 'public',
+};
 
 export const AuthContext = createContext<RBAuthContextType>({
   // to check if authenticated or not
   isAuth: false,
   reloading: true,
   // store user
-  user: { role: 'public' },
+  user: RBAuthInitialUser,
   // accessToken of user for Auth0
-  accessToken: '',
+  tokens: { accessToken: null, refreshToken: null },
   logic: {
     // login process
     login: async () => console.log('please change initialteLogin'),
@@ -19,8 +28,7 @@ export const AuthContext = createContext<RBAuthContextType>({
     logout: async () => console.log('please change logout'),
     silent: async () => console.log('please change silentAuth'),
     // handle Auth0 login process
-    handle: async () =>
-      console.log('please change handleAuthentication'),
+    handle: async () => console.log('please change handleAuthentication'),
   },
   routes: {
     public: '/',

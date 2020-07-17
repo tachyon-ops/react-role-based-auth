@@ -1,81 +1,59 @@
-import React, { useContext, useState } from 'react';
-import {
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native-gesture-handler';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
-  Text,
-  Keyboard,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Input } from 'react-native-elements';
-import { AuthContext } from 'react-rb-auth';
-import { Icon } from 'react-native-vector-icons/Icon';
+import { Card, Button, Input } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { AppButton } from '../../../ui/AppButton';
 import { StyleContext } from '../../../services/StyleService';
 import { Screen } from '../../../ui/Screen';
+import { AppAuthContext } from '../../../services/AppAuthContext';
+import { Line } from '../../../ui/Line';
 
-// TODO: https://github.com/spencercarli/react-navigation-auth-flow/blob/finished-code/app/screens/SignUp.js
+export const SignupScreen: React.FC = () => {
+  const emailRef = React.createRef<Input>();
+  const passwordRef = React.createRef<Input>();
 
-export const SignupScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const nav = useNavigation();
-
+  const auth = useContext(AppAuthContext);
   const style = useContext(StyleContext);
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      borderColor: 'red',
-      borderWidth: 10,
-      borderStyle: 'solid',
-      padding: 100,
     },
   });
 
-  const auth = useContext(AuthContext);
+  const onEmailChange = (text: string) => setEmail(text);
+  const onPasswordChange = (text: string) => setPassword(text);
+  const next = () => setTimeout(() => passwordRef.current.focus(), 100);
 
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [passwordConfirmError, setPasswordConfirmError] = useState('');
-
-  /**
-   * Signup
-   */
-  const validate = () => {
-    if (email === '') {
-      setEmailError('You must set email');
-      return false;
-    }
-    if (password === '') {
-      setPasswordError('You must set a password');
-      return false;
-    }
-    if (passwordConfirm === '') {
-      setPasswordConfirmError('You must set a password');
-      return false;
-    }
-    if (password !== passwordConfirm) {
-      console.log('Passwords do not match');
-      setPasswordConfirmError('Passwords do not match');
-      return false;
-    }
-    return true;
-  };
-  const onSuccess = () => nav.navigate('Login');
-  const onFailure = () => console.log('Signup failed');
-  const submit = () => {
-    if (validate()) auth.logic.signup().then(onSuccess).catch(onFailure);
-  };
+  useEffect(() => {
+    // emailRef.current.focus();
+  }, []);
 
   const login = () => nav.navigate('Login');
+
+  const onSuccess = (res) => {
+    console.log('onSuccess res', res);
+    // nav.navigate('Login');
+  };
+  const onFailure = (err) => {
+    console.log('onFailure err', err);
+  };
+  const signup = () => auth.logic.signup().then(onSuccess).catch(onFailure);
+
   return (
     <Screen>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -85,36 +63,36 @@ export const SignupScreen = () => {
             style={styles.container}
           >
             <Card
-              title="SignUp"
+              title="Login"
               titleStyle={style.typography.title}
               containerStyle={{ paddingVertical: 20, minWidth: 350 }}
             >
               <Input
+                autoFocus
+                keyboardType="email-address"
+                ref={emailRef}
+                value={email}
                 label="Email"
                 placeholder="Email address..."
-                value={email}
-                onChangeText={setEmail}
-                errorMessage={emailError}
+                onChangeText={onEmailChange}
+                returnKeyType="next"
+                // onEndEditing={next}
+                onSubmitEditing={next}
+                leftIcon={<Icon name="email-outline" size={24} color="grey" />}
               />
               <Input
+                ref={passwordRef}
+                value={password}
                 label="Password"
                 secureTextEntry
                 placeholder="Password..."
-                value={password}
-                onChangeText={setPassword}
-                errorMessage={passwordError}
-              />
-              <Input
-                label="Confirm Password"
-                secureTextEntry
-                placeholder="Confirm Password..."
-                value={passwordConfirm}
-                onChangeText={setPasswordConfirm}
-                errorMessage={passwordConfirmError}
+                onChangeText={onPasswordChange}
+                returnKeyType="send"
+                leftIcon={<Icon name="lock-outline" size={24} color="grey" />}
               />
 
-              <Text>HERE</Text>
-              <AppButton size={15} label="Sign up" onPress={submit} />
+              <AppButton size={15} label="Sign up" onPress={signup} />
+              <Line />
               <AppButton size={15} label="Login" onPress={login} />
             </Card>
           </KeyboardAvoidingView>

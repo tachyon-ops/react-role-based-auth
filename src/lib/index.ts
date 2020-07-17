@@ -1,10 +1,11 @@
 import type React from 'react';
 
-import { AuthContext } from './roles-based-auth/context';
-import { AuthCallback } from './authServices/AuthCallback';
-import { RefreshApp } from './authServices/RefreshApp';
-import { SecureScreen } from './authServices/SecureScreen';
+import { AuthCallback } from './components/AuthCallback';
+import { RefreshApp } from './components/RefreshApp';
+import { SecureScreen } from './components/SecureScreen';
+import { Auth } from './components/Auth';
 import { AuthApiForContext } from './authServices/BaseAuthApiWrapper';
+import { AuthContext } from './roles-based-auth/context';
 
 /**
  * SecureRoute Types
@@ -35,7 +36,7 @@ export type RBAuthRulesInterface<RoleType extends string> = {
  * User types
  */
 type RBAuthGenericRoles<T extends string> = 'admin' | 'public' | T;
-export interface UserModelWithRole<T extends string = RBAuthBaseRoles> {
+export interface RBAuthUserModelWithRole<T extends string = RBAuthBaseRoles> {
   role: RBAuthGenericRoles<T>;
 }
 
@@ -46,9 +47,14 @@ export type UnknownAuthProcess = <R>(
   ...args: any
 ) => Promise<R | unknown | void>;
 
+export type RBAuthTokens = {
+  accessToken: string | null;
+  refreshToken: string | null;
+};
+
 // Auth Context type
 export type RBAuthContextType<
-  TUser extends UserModelWithRole<string> = UserModelWithRole,
+  TUser extends RBAuthUserModelWithRole<string> = RBAuthUserModelWithRole,
   TRules extends RBAuthRulesInterface<string> = RBAuthRulesInterface<
     RBAuthBaseRoles
   >,
@@ -61,7 +67,7 @@ export type RBAuthContextType<
   isAuth: boolean; // to check if authenticated or not
   reloading: boolean;
   user: TUser; // store all the user details
-  accessToken: string; // accessToken of user for Auth0
+  tokens: RBAuthTokens; // accessToken of user for Auth0
   logic: {
     login: LoginType; // to start the login process
     signup: SignUpType;
@@ -78,7 +84,7 @@ export type RBAuthContextType<
 
 // export type RBAuthReactContext<TUser extends UserModelWithRole<string>> = React.Context<RBAuthContextType<TUser>>;
 export type RBAuthReactContext<
-  TUser extends UserModelWithRole<string>,
+  TUser extends RBAuthUserModelWithRole<string>,
   TRules extends RBAuthRulesInterface<string>,
   // AuthApi extends AuthApiInterface
   LoginType extends UnknownAuthProcess = UnknownAuthProcess,
@@ -99,7 +105,7 @@ export type RBAuthReactContext<
   >
 >;
 
-export type SetterType = (isAuth: boolean) => void;
+export type SetterType = (variable: any) => void;
 
 export interface AuthApiInterface {
   login: UnknownAuthProcess;
@@ -111,11 +117,10 @@ export interface AuthApiInterface {
 export type PartialAuthApi = Partial<AuthApiInterface>;
 
 export {
-  // Roles Based Auth
   AuthContext,
-  // AuthServices
-  AuthCallback,
+  AuthApiForContext,
+  Auth,
   RefreshApp,
   SecureScreen,
-  AuthApiForContext,
+  AuthCallback,
 };

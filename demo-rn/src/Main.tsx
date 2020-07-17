@@ -1,9 +1,10 @@
 import React from 'react';
 import { Navigation } from './navigation';
-import { RefreshApp } from 'react-rb-auth';
+import { Auth, RefreshApp } from 'react-rb-auth';
 import 'react-native-gesture-handler';
 
-import { Auth } from './services/Auth';
+import { AuthApi } from './services/AuthApi';
+// import { Auth } from './services/Auth';
 import { AuthReloading } from './components/AuthReloading';
 import { AssetsLoader } from './services/AssetsLoader';
 import { StyleContext, StyleContextValue } from './services/StyleService';
@@ -11,7 +12,7 @@ import { StyleContext, StyleContextValue } from './services/StyleService';
 export const Main: React.FC = () => (
   <AssetsLoader>
     <StyleContext.Provider value={StyleContextValue}>
-      <Auth>
+      <Auth api={AuthApi} routes={{ public: 'Home', private: 'Admin' }}>
         <RefreshApp locationPathName={'none'} AuthReloadingComp={AuthReloading}>
           <Navigation />
         </RefreshApp>

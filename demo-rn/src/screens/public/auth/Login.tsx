@@ -15,6 +15,7 @@ import { AppButton } from '../../../ui/AppButton';
 import { StyleContext } from '../../../services/StyleService';
 import { Screen } from '../../../ui/Screen';
 import { AppAuthContext } from '../../../services/AppAuthContext';
+import { Line } from '../../../ui/Line';
 
 export const LoginScreen: React.FC = () => {
   const emailRef = React.createRef<Input>();
@@ -91,8 +92,9 @@ export const LoginScreen: React.FC = () => {
                 leftIcon={<Icon name="lock-outline" size={24} color="grey" />}
               />
 
-              <AppButton size={15} label="Sign up" onPress={signup} />
               <AppButton size={15} label="Login" onPress={login} />
+              <Line />
+              <AppButton size={15} label="Sign up" onPress={signup} />
             </Card>
           </KeyboardAvoidingView>
         </View>
