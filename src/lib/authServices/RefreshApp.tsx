@@ -7,17 +7,17 @@ export const RefreshApp: React.FC<{
   AuthReloadingComp: React.FC;
   authCallbackRoute?: string;
 }> = (props) => {
-  const authContext = useContext(AuthContext);
+  const auth = useContext(AuthContext);
   const [isAuthReloaded, setIsAuthReloaded] = useState(false);
   const [showReloadCom, setShowReloadComp] = useState(true);
 
   useEffect(() => {
-    setShowReloadComp(props.locationPathName !== props.authCallbackRoute && authContext.reloading);
-  }, [props.locationPathName, props.authCallbackRoute, authContext.reloading]);
+    setShowReloadComp(props.locationPathName !== props.authCallbackRoute && auth.reloading);
+  }, [props.locationPathName, props.authCallbackRoute, auth.reloading]);
 
   if (!isAuthReloaded) {
     setIsAuthReloaded(true);
-    if (props.locationPathName !== props.authCallbackRoute) authContext.silentAuth();
+    if (props.locationPathName !== props.authCallbackRoute) auth.logic.silent();
   }
   if (showReloadCom) return <props.AuthReloadingComp />;
   else return <>{props.children}</>;

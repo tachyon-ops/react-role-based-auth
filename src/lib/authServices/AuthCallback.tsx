@@ -9,15 +9,22 @@ interface Props {
   locationHash: string;
   Redirect?: null | RBAuthRedirect;
 }
-export const AuthCallback: React.FC<Props> = ({ children, locationHash, Redirect }) => (
+export const AuthCallback: React.FC<Props> = ({
+  children,
+  locationHash,
+  Redirect,
+}) => (
   <AuthContext.Consumer>
-    {(authContext) => {
+    {(auth) => {
       if (/access_token|id_token|error/.test(locationHash)) {
-        authContext.handleAuthentication();
+        auth.logic.handle();
         return <></>;
       }
-      if (Redirect) return <Redirect to={authContext.routes.public} />;
-      else console.log('AuthCallback has no redirect, be sure handleAuthentication has programatic redirection');
+      if (Redirect) return <Redirect to={auth.routes.public} />;
+      else
+        console.log(
+          'AuthCallback has no redirect, be sure handleAuthentication has programatic redirection'
+        );
       return <>{children}</>;
     }}
   </AuthContext.Consumer>

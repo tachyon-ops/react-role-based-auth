@@ -8,11 +8,11 @@ export const SecureScreen: React.FC<{
   NotAllowed?: React.FC;
 }> = ({ Redirect, Allowed, NotAllowed }) => (
   <AuthContext.Consumer>
-    {(authContext) => {
-      if (!authContext.authenticated) {
+    {(auth) => {
+      if (!auth.isAuth) {
         if (NotAllowed) return <NotAllowed />;
         // TODO: set 'last route' in auth context if app needs to gracefully recover
-        return <Redirect to={authContext.routes.public} />;
+        return <Redirect to={auth.routes.public} />;
       }
       return <Allowed />;
     }}

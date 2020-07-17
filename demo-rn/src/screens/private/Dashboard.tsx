@@ -6,35 +6,31 @@ import { AppButton } from '../../ui/AppButton';
 import { Card } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { Screen } from '../../ui/Screen';
-
-const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    color: '#DEC79B',
-    fontSize: 30,
-  },
-});
+import { StyleContext } from '../../services/StyleService';
 
 export const DashboardScreen: React.FC = () => {
+  const style = useContext(StyleContext);
   const authContext = useContext(AuthContext);
   const nav = useNavigation();
-  const onSignOut = () =>
-    new Promise((resolve) => {
-      authContext.logout();
-      resolve();
-    });
-  const logout = () => onSignOut().then(() => nav.navigate('Home'));
+
+  const styles = StyleSheet.create({
+    container: {
+      // flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });
+
+  const logout = () => authContext.logic.logout();
+  const goToCredits = () => nav.navigate('Credits');
   return (
     <Screen>
       <View style={styles.container}>
-        <Text style={styles.text}>Dashboard</Text>
+        <Text style={style.typography.title}>Dashboard</Text>
         <View style={{ paddingVertical: 20 }}>
           <Card
             title="John Doe"
+            titleStyle={style.typography.title}
             containerStyle={{ paddingVertical: 20, minWidth: 350 }}
           >
             <View
@@ -52,6 +48,7 @@ export const DashboardScreen: React.FC = () => {
               <Text style={{ color: 'white', fontSize: 28 }}>JD</Text>
             </View>
             <AppButton label="Logout" onPress={logout} />
+            <AppButton label="Credits" onPress={goToCredits} />
           </Card>
         </View>
       </View>

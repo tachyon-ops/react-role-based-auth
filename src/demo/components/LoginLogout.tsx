@@ -5,21 +5,25 @@ import { regUser, editorUser } from '../models/user';
 
 export const LoginLogout: React.FC = () => (
   <AppAuthContext.Consumer>
-    {(authContext) => (
+    {(auth) => (
       <>
-        {!authContext.authenticated && (
+        {!auth.isAuth && (
           <div>
             <h3>You are anonymous</h3>
-            <button onClick={() => authContext.login(regUser)}>Login Admin</button>
-            <button onClick={() => authContext.login(editorUser)}>Login Editor</button>
+            <button onClick={() => auth.logic.login(regUser)}>
+              Login Admin
+            </button>
+            <button onClick={() => auth.logic.login(editorUser)}>
+              Login Editor
+            </button>
           </div>
         )}
-        {authContext.authenticated && (
+        {auth.isAuth && (
           <div>
             <h3>Welcome USER!</h3>
-            <h5>Your slug is: {authContext.user.slug}</h5>
-            <h5>Your name is: {authContext.user.name}</h5>
-            <button onClick={authContext.logout}>Logout</button>
+            <h5>Your slug is: {auth.user.slug}</h5>
+            <h5>Your name is: {auth.user.name}</h5>
+            <button onClick={auth.logic.logout}>Logout</button>
           </div>
         )}
         <br />

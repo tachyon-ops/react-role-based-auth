@@ -1,17 +1,27 @@
 import { createContext } from 'react';
 
-import type { RBAuthContextType } from '..';
-import type { RBAuthReactContext } from '../index';
+import { RBAuthContextType, RBAuthReactContext } from '..';
 
 export const AuthContext = createContext<RBAuthContextType>({
-  authenticated: false, // to check if authenticated or not
+  // to check if authenticated or not
+  isAuth: false,
   reloading: true,
-  user: { role: 'public' }, // store all user details
-  accessToken: '', // accessToken of user for Auth0
-  login: () => console.log('please change initialteLogin'), // to start the login process
-  logout: () => console.log('please change logout'), // logout the user
-  silentAuth: () => console.log('please change silentAuth'),
-  handleAuthentication: () => console.log('please change handleAuthentication'), // handle Auth0 login process
+  // store user
+  user: { role: 'public' },
+  // accessToken of user for Auth0
+  accessToken: '',
+  logic: {
+    // login process
+    login: async () => console.log('please change initialteLogin'),
+    // signup process
+    signup: async () => console.log('please change initialteLogin'),
+    // logout the user
+    logout: async () => console.log('please change logout'),
+    silent: async () => console.log('please change silentAuth'),
+    // handle Auth0 login process
+    handle: async () =>
+      console.log('please change handleAuthentication'),
+  },
   routes: {
     public: '/',
     private: '/dashboard',
@@ -27,4 +37,4 @@ export const AuthContext = createContext<RBAuthContextType>({
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}) as RBAuthReactContext<any, any>;
+}) as RBAuthReactContext<any, any, any>;
