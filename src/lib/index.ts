@@ -4,8 +4,12 @@ import { AuthCallback } from './components/AuthCallback';
 import { RefreshApp } from './components/RefreshApp';
 import { SecureScreen } from './components/SecureScreen';
 import { Auth } from './components/Auth';
-import { AuthApiForContext } from './authServices/BaseAuthApiWrapper';
+import {
+  AuthApiForContext,
+  TokensUtil,
+} from './authServices/BaseAuthApiWrapper';
 import { AuthContext } from './roles-based-auth/context';
+import { HeadersBuilder } from './authServices/HeadersUtil';
 
 /**
  * SecureRoute Types
@@ -43,14 +47,10 @@ export interface RBAuthUserModelWithRole<T extends string = RBAuthBaseRoles> {
 /**
  * Context types
  */
+export type KnownAuthProcess<R> = (...args: any) => Promise<R>;
 export type UnknownAuthProcess = <R>(
   ...args: any
 ) => Promise<R | unknown | void>;
-
-export type RBAuthTokens = {
-  accessToken: string | null;
-  refreshToken: string | null;
-};
 
 // Auth Context type
 export type RBAuthContextType<
@@ -67,7 +67,7 @@ export type RBAuthContextType<
   isAuth: boolean; // to check if authenticated or not
   reloading: boolean;
   user: TUser; // store all the user details
-  tokens: RBAuthTokens; // accessToken of user for Auth0
+  tokens: Partial<RBAuthTokensType>; // accessToken of user for Auth0
   logic: {
     login: LoginType; // to start the login process
     signup: SignUpType;
@@ -82,6 +82,9 @@ export type RBAuthContextType<
   rules?: TRules;
 };
 
+/**
+ * React Context Type - for your AppAuthContext
+ */
 // export type RBAuthReactContext<TUser extends UserModelWithRole<string>> = React.Context<RBAuthContextType<TUser>>;
 export type RBAuthReactContext<
   TUser extends RBAuthUserModelWithRole<string>,
@@ -105,16 +108,52 @@ export type RBAuthReactContext<
   >
 >;
 
+/**
+ * Types for Auth processing
+ */
 export type SetterType = (variable: any) => void;
 
 export interface AuthApiInterface {
-  login: UnknownAuthProcess;
+  login: KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
   logout: UnknownAuthProcess;
   signup: UnknownAuthProcess;
   handle: UnknownAuthProcess;
   silent: UnknownAuthProcess;
 }
 export type PartialAuthApi = Partial<AuthApiInterface>;
+
+export type RBAuthTokensType = {
+  accessToken: string;
+  refreshToken?: string;
+  idToken?: string;
+  expiresIn: string;
+  scope: string;
+  tokenType: string;
+};
+export type RBAuthLoginResponse<
+  TUser extends RBAuthUserModelWithRole<string>
+> = {
+  tokens: Partial<RBAuthTokensType>;
+  user: Partial<TUser> & RBAuthUserModelWithRole<string>;
+};
+
+export abstract class RBAuthBaseStorageMechanism {
+  // Access Token
+  abstract set Access(accessToken: string);
+  abstract get Access(): string | null;
+  // Refresh Token
+  abstract set Refresh(refreshToken: string);
+  abstract get Refresh(): string | null;
+  // OpenId Token
+  abstract set OpenId(openIdToken: string);
+  abstract get OpenId(): string | null;
+  // Type Token
+  abstract set Type(type: string);
+  abstract get Type(): string | null;
+}
 
 export {
   AuthContext,
@@ -123,4 +162,6 @@ export {
   RefreshApp,
   SecureScreen,
   AuthCallback,
+  TokensUtil,
+  HeadersBuilder,
 };

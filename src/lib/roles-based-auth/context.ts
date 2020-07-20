@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { RBAuthTokensType } from '../index';
 
 import {
   RBAuthContextType,
@@ -9,6 +10,14 @@ import {
 
 export const RBAuthInitialUser: RBAuthUserModelWithRole<RBAuthBaseRoles> = {
   role: 'public',
+};
+export const RBAuthInitialToken: RBAuthTokensType = {
+  accessToken: null,
+  refreshToken: null,
+  idToken: null,
+  tokenType: null,
+  expiresIn: null,
+  scope: null,
 };
 
 export const AuthContext = createContext<RBAuthContextType>({

@@ -18,9 +18,11 @@ import { AppAuthContext } from '../../../services/AppAuthContext';
 import { Line } from '../../../ui/Line';
 
 export const SignupScreen: React.FC = () => {
+  const nameRef = React.createRef<Input>();
   const emailRef = React.createRef<Input>();
   const passwordRef = React.createRef<Input>();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -35,8 +37,7 @@ export const SignupScreen: React.FC = () => {
     },
   });
 
-  const onEmailChange = (text: string) => setEmail(text);
-  const onPasswordChange = (text: string) => setPassword(text);
+  const endName = () => setTimeout(() => emailRef.current.focus(), 100);
   const next = () => setTimeout(() => passwordRef.current.focus(), 100);
 
   useEffect(() => {
@@ -52,7 +53,16 @@ export const SignupScreen: React.FC = () => {
   const onFailure = (err) => {
     console.log('onFailure err', err);
   };
-  const signup = () => auth.logic.signup().then(onSuccess).catch(onFailure);
+  const validate = () => {
+    if (name === '') return false;
+    if (email === '') return false;
+    if (password === '' || password.length < 4) return false;
+    return true;
+  };
+  const signup = () => {
+    if (validate())
+      auth.logic.signup(name, email, password).then(onSuccess).catch(onFailure);
+  };
 
   return (
     <Screen>
@@ -69,12 +79,24 @@ export const SignupScreen: React.FC = () => {
             >
               <Input
                 autoFocus
+                ref={nameRef}
+                value={name}
+                label={'Name'}
+                placeholder="Name..."
+                onChangeText={setName}
+                returnKeyType="next"
+                onSubmitEditing={endName}
+                leftIcon={
+                  <Icon name="account-outline" size={24} color="grey" />
+                }
+              />
+              <Input
                 keyboardType="email-address"
                 ref={emailRef}
                 value={email}
                 label="Email"
                 placeholder="Email address..."
-                onChangeText={onEmailChange}
+                onChangeText={setEmail}
                 returnKeyType="next"
                 // onEndEditing={next}
                 onSubmitEditing={next}
@@ -86,7 +108,7 @@ export const SignupScreen: React.FC = () => {
                 label="Password"
                 secureTextEntry
                 placeholder="Password..."
-                onChangeText={onPasswordChange}
+                onChangeText={setPassword}
                 returnKeyType="send"
                 leftIcon={<Icon name="lock-outline" size={24} color="grey" />}
               />

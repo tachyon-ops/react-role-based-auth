@@ -1,12 +1,12 @@
 import { RBAuthBaseRoles, RBAuthUserModelWithRole } from 'react-rb-auth';
 
 // type AppRoles = RBAuthBaseRoles | 'editor';
-type AppRoles = RBAuthBaseRoles | 'editor';
+type AppRole = RBAuthBaseRoles | 'editor';
 
-export interface UserModel extends RBAuthUserModelWithRole<AppRoles> {
+export interface UserModel extends RBAuthUserModelWithRole<AppRole> {
   slug: string;
   name: string;
-  role: AppRoles;
+  role: AppRole;
 }
 
 export const anonUser: UserModel = { slug: 'anon', name: '', role: 'public' };

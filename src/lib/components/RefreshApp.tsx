@@ -12,13 +12,21 @@ export const RefreshApp: React.FC<{
   const [showReloadCom, setShowReloadComp] = useState(true);
 
   useEffect(() => {
-    setShowReloadComp(props.locationPathName !== props.authCallbackRoute && auth.reloading);
+    setShowReloadComp(
+      props.locationPathName !== props.authCallbackRoute && auth.reloading
+    );
   }, [props.locationPathName, props.authCallbackRoute, auth.reloading]);
 
   if (!isAuthReloaded) {
     setIsAuthReloaded(true);
-    if (props.locationPathName !== props.authCallbackRoute) auth.logic.silent();
+    if (props.locationPathName !== props.authCallbackRoute) {
+      auth.logic.silent().then(console.log).catch(console.log);
+    }
   }
-  if (showReloadCom) return <props.AuthReloadingComp />;
-  else return <>{props.children}</>;
+  return (
+    <>
+      {showReloadCom && <props.AuthReloadingComp />}
+      {!showReloadCom && props.children}
+    </>
+  );
 };

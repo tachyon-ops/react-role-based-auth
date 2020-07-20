@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import {
   AuthApiInterface,
-  RBAuthTokens,
+  RBAuthTokensType,
   RBAuthUserModelWithRole,
   RBAuthBaseRoles,
   RBAuthContextType,
 } from '..';
 import { AuthApiForContext } from '../authServices/BaseAuthApiWrapper';
-import { AuthContext, RBAuthInitialUser } from '../roles-based-auth/context';
+import {
+  AuthContext,
+  RBAuthInitialUser,
+  RBAuthInitialToken,
+} from '../roles-based-auth/context';
 
 export const Auth: React.FC<{
   api: AuthApiInterface;
@@ -16,10 +20,9 @@ export const Auth: React.FC<{
 }> = ({ children, api, routes }) => {
   const [auth, setAuth] = React.useState(false);
   const [reloading, setReloading] = React.useState(true);
-  const [tokens, setTokens] = React.useState<RBAuthTokens>({
-    accessToken: null,
-    refreshToken: null,
-  });
+  const [tokens, setTokens] = React.useState<RBAuthTokensType>(
+    RBAuthInitialToken
+  );
   const [user, setUser] = React.useState<
     RBAuthUserModelWithRole<RBAuthBaseRoles>
   >(RBAuthInitialUser);
@@ -44,10 +47,6 @@ export const Auth: React.FC<{
       public: {},
     },
   };
-
-  useEffect(() => {
-    logic.silent().catch((err) => console.log('Silent logic error: ', err));
-  }, []);
 
   return (
     <AuthContext.Provider value={contextVal}>{children}</AuthContext.Provider>
