@@ -5,28 +5,36 @@ import { AuthContext } from '..';
 export const RefreshApp: React.FC<{
   locationPathName: string;
   AuthReloadingComp: React.FC;
+  AuthLoadingComp?: React.FC;
   authCallbackRoute?: string;
 }> = (props) => {
   const auth = useContext(AuthContext);
-  const [isAuthReloaded, setIsAuthReloaded] = useState(false);
-  const [showReloadCom, setShowReloadComp] = useState(true);
+  const [firstAuthCheck, setFirstAuthCheck] = useState(true);
+  const [isReloading, setIsReloading] = useState(true);
 
   useEffect(() => {
-    setShowReloadComp(
-      props.locationPathName !== props.authCallbackRoute && auth.reloading
-    );
-  }, [props.locationPathName, props.authCallbackRoute, auth.reloading]);
+    if (auth.reloading && props.AuthLoadingComp !== undefined) setIsReloading(true);
+    else setIsReloading(false);
+  }, [auth.reloading, props.AuthLoadingComp]);
 
-  if (!isAuthReloaded) {
-    setIsAuthReloaded(true);
-    if (props.locationPathName !== props.authCallbackRoute) {
-      auth.logic.silent().then(console.log).catch(console.log);
+  useEffect(() => {
+    if (firstAuthCheck) {
+      if (props.locationPathName !== props.authCallbackRoute) {
+        auth.logic
+          .silent()
+          .then(console.log)
+          .catch(console.log)
+          .finally(() => setFirstAuthCheck(false));
+      } else setFirstAuthCheck(false);
     }
-  }
-  return (
-    <>
-      {showReloadCom && <props.AuthReloadingComp />}
-      {!showReloadCom && props.children}
-    </>
-  );
+  }, [firstAuthCheck]);
+
+  if (firstAuthCheck) return <props.AuthReloadingComp />;
+  else
+    return (
+      <>
+        {isReloading && <props.AuthLoadingComp />}
+        {props.children}
+      </>
+    );
 };

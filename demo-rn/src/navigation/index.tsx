@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { NavigationContainer, Theme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { AuthContext } from 'react-rb-auth';
 
 import { HomeScreen } from '../screens/public/Home';
 import { LoginScreen } from '../screens/public/auth/Login';
 import { SignupScreen } from '../screens/public/auth/SignUp';
 import { DashboardScreen } from '../screens/private/Dashboard';
-import { AuthContext } from '../../../src/lib/roles-based-auth/context';
 import { CreditsScreen } from '../screens/Credits';
 import { StyleContext } from '../services/StyleService';
 
@@ -38,10 +38,7 @@ export const Navigation: React.FC = () => {
               </>
             ) : (
               <>
-                <Stack.Screen
-                  name="Admin/Dashboard"
-                  component={DashboardScreen}
-                />
+                <Stack.Screen name="Admin/Dashboard" component={DashboardScreen} />
               </>
             )}
             <Stack.Screen name="Credits" component={CreditsScreen} />

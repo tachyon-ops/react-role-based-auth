@@ -9,11 +9,7 @@ interface Props {
   locationHash: string;
   Redirect?: null | RBAuthRedirect;
 }
-export const AuthCallback: React.FC<Props> = ({
-  children,
-  locationHash,
-  Redirect,
-}) => (
+export const AuthCallback: React.FC<Props> = ({ children, locationHash, Redirect }) => (
   <AuthContext.Consumer>
     {(auth) => {
       if (/access_token|id_token|error/.test(locationHash)) {

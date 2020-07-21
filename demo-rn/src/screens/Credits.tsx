@@ -1,13 +1,7 @@
 import React, { useContext } from 'react';
 import { Screen } from '../ui/Screen';
 import { StyleContext } from '../services/StyleService';
-import {
-  Text,
-  Linking,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { Text, Linking, View, TouchableOpacity, StyleSheet } from 'react-native';
 
 const FontButton: React.FC = () => {
   const style = useContext(StyleContext);
@@ -15,9 +9,7 @@ const FontButton: React.FC = () => {
     text: { textAlign: 'center', ...style.typography.title, fontSize: 30 },
   });
   return (
-    <TouchableOpacity
-      onPress={() => Linking.openURL('http://www.onlinewebfonts.com')}
-    >
+    <TouchableOpacity onPress={() => Linking.openURL('http://www.onlinewebfonts.com')}>
       <Text style={styles.text}>oNline Web Fonts</Text>
     </TouchableOpacity>
   );
@@ -35,9 +27,7 @@ export const CreditsScreen: React.FC = () => {
           paddingVertical: 20,
         }}
       >
-        <Text style={{ ...style.typography.paragraph, textAlign: 'center' }}>
-          Font made from
-        </Text>
+        <Text style={{ ...style.typography.paragraph, textAlign: 'center' }}>Font made from</Text>
         <FontButton />
         <Text style={{ ...style.typography.paragraph, textAlign: 'center' }}>
           {' '}

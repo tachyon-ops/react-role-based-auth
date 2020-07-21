@@ -60,8 +60,7 @@ export const SignupScreen: React.FC = () => {
     return true;
   };
   const signup = () => {
-    if (validate())
-      auth.logic.signup(name, email, password).then(onSuccess).catch(onFailure);
+    if (validate()) auth.logic.signup(name, email, password).then(onSuccess).catch(onFailure);
   };
 
   return (
@@ -86,9 +85,7 @@ export const SignupScreen: React.FC = () => {
                 onChangeText={setName}
                 returnKeyType="next"
                 onSubmitEditing={endName}
-                leftIcon={
-                  <Icon name="account-outline" size={24} color="grey" />
-                }
+                leftIcon={<Icon name="account-outline" size={24} color="grey" />}
               />
               <Input
                 keyboardType="email-address"

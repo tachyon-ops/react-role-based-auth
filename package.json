@@ -145,7 +145,10 @@
     "modulePaths": [],
     "moduleNameMapper": {
       "^react-native$": "react-native-web",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "react-rb-auth/(.*)": [
+        "<rootDir>/src/lib/$1"
+      ]
     },
     "moduleFileExtensions": [
       "web.js",
@@ -169,7 +172,8 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "es5",
-    "useTabs": false
+    "useTabs": false,
+    "printWidth": 100
   },
   "peerDependencies": {
     "react": "*"

@@ -49,3 +49,37 @@ export const AuthReloading: React.FC = () => {
     </View>
   );
 };
+
+export const AuthLoading: React.FC = () => {
+  const asset = '../assets/23315-office-yoga.json';
+  const animation = createRef<AnimatedLottieView>();
+
+  useEffect(() => {
+    if (animation.current) {
+      animation.current.play();
+    }
+  }, []);
+
+  return (
+    <View
+      style={{
+        ...styles.animationContainer,
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'white',
+        zIndex: 1000,
+      }}
+    >
+      <LottieView
+        ref={animation}
+        style={{
+          height: 300,
+          backgroundColor: '#fff',
+        }}
+        source={require(asset)}
+      />
+      <View style={styles.buttonContainer}>
+        <Text style={styles.text}>Auth reloading...</Text>
+      </View>
+    </View>
+  );
+};

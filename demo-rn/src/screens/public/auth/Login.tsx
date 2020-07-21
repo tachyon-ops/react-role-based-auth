@@ -46,14 +46,13 @@ export const LoginScreen: React.FC = () => {
   const signup = () => nav.navigate('Signup');
 
   const onSuccess = (res) => {
-    console.log('onSuccess res', res);
+    // console.log('onSuccess res', res);
     // nav.navigate('Admin/Dashboard');
   };
   const onFailure = (err) => {
     console.log('onFailure err', err);
   };
-  const login = () =>
-    auth.logic.login(email, password).then(onSuccess).catch(onFailure);
+  const login = () => auth.logic.login(email, password).then(onSuccess).catch(onFailure);
 
   return (
     <Screen>

@@ -12,12 +12,12 @@ export const RBAuthInitialUser: RBAuthUserModelWithRole<RBAuthBaseRoles> = {
   role: 'public',
 };
 export const RBAuthInitialToken: RBAuthTokensType = {
-  accessToken: null,
-  refreshToken: null,
-  idToken: null,
-  tokenType: null,
-  expiresIn: null,
-  scope: null,
+  accessToken: '',
+  refreshToken: '',
+  openIdToken: '',
+  tokenType: '',
+  expiresIn: '',
+  scope: '',
 };
 
 export const AuthContext = createContext<RBAuthContextType>({

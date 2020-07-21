@@ -6,7 +6,6 @@ import {
   HeadersBuilder,
 } from 'react-rb-auth';
 
-// @ts-ignore
 import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from '@env';
 
 export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
@@ -17,11 +16,7 @@ export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   tokens: RBAuthTokensType;
 }>;
 export type LogoutType = (email: string, password: string) => Promise<unknown>;
-export type SignupType = (
-  name: string,
-  email: string,
-  password: string
-) => Promise<unknown>;
+export type SignupType = (name: string, email: string, password: string) => Promise<unknown>;
 export type HandleType = () => Promise<unknown>;
 export type SilentType = () => Promise<unknown>;
 
@@ -37,28 +32,26 @@ type RawTokensType = {
   access_token: string;
   refresh_token: string;
   id_token: string;
-  scope_token: string;
   expires_in: string;
   scope: string;
   token_type: string;
 };
-const mapRawTokens = (rawTokens: RawTokensType) => ({
+const mapRawTokens = (rawTokens: RawTokensType): RBAuthTokensType => ({
   accessToken: rawTokens.access_token,
   refreshToken: rawTokens.refresh_token,
-  idToken: rawTokens.id_token,
+  openIdToken: rawTokens.id_token,
   scope: rawTokens.scope,
   expiresIn: rawTokens.expires_in,
   tokenType: rawTokens.token_type,
 });
 
-const TEST_TIMEOUT = 1000;
+const TEST_TIMEOUT = 2000;
 
 // api docs: https://auth0.com/docs/api/authentication#revoke-refresh-token
 
 export class AuthApi implements PartialAuthApi {
   static login: LoginType = async (username: string, password: string) =>
     new Promise(async (resolve, reject) => {
-      console.log('AuthApi.login: args: ', username, password);
       try {
         await fetch(`https://${AUTH0_DOMAIN}/oauth/token`, {
           method: HTTPMethod.POST,
@@ -78,6 +71,7 @@ export class AuthApi implements PartialAuthApi {
           if (!res.ok) reject(res.statusText);
           else {
             const rawTokens = await res.json();
+            console.log('raw tokens: ', rawTokens);
             const tokens: RBAuthTokensType = mapRawTokens(rawTokens);
             const userRes = await fetch(`https://${AUTH0_DOMAIN}/userinfo`, {
               method: HTTPMethod.POST,
@@ -98,12 +92,11 @@ export class AuthApi implements PartialAuthApi {
 
   // https://auth0.com/docs/logout
   static logout = () =>
-    new Promise((a, r) =>
-      setTimeout(() => {
-        console.log('going to resolve handle');
-        a('logout accept');
-      }, TEST_TIMEOUT)
-    );
+    new Promise(async (resolve, reject) => {
+      const res = await fetch(`https://${AUTH0_DOMAIN}/v2/logout?federated= `);
+      if (res.ok) resolve(res);
+      else reject({ status: res.status, statusText: res.statusText });
+    });
 
   static signup: SignupType = async (name, email, password) => {
     console.log('going to signup!', name, email, password);
@@ -139,10 +132,18 @@ export class AuthApi implements PartialAuthApi {
     );
 
   static silent = () =>
-    new Promise((a, r) =>
+    new Promise((a, r) => {
+      const tokens: RBAuthTokensType = {
+        accessToken: '', // TokensUtil.getAccessToken(),
+        refreshToken: '', // TokensUtil.getRefreshToken(),
+        openIdToken: '', // TokensUtil.getIdToken(),
+        tokenType: '', // TokensUtil.getTokenType(),
+        expiresIn: '', // TokensUtil.getExpiresIn(),
+        scope: '', // TokensUtil.getScope(),
+      };
       setTimeout(() => {
-        console.log('going to reject silent');
+        console.log('going to reject silent', tokens);
         r('silent reject');
-      }, TEST_TIMEOUT)
-    );
+      }, TEST_TIMEOUT);
+    });
 }

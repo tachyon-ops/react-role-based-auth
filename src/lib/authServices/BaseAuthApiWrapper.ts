@@ -5,13 +5,10 @@ import {
   RBAuthTokensType,
   RBAuthUserModelWithRole,
   KnownAuthProcess,
-  RBAuthBaseStorageMechanism,
 } from '..';
-import {
-  RBAuthInitialUser,
-  RBAuthInitialToken,
-} from '../roles-based-auth/context';
+import { RBAuthInitialUser } from '../roles-based-auth/context';
 import { RBAuthBaseRoles } from '../index';
+import { TokenUtil } from './TokenUtilities';
 
 type ProcessesType = {
   login?: KnownAuthProcess<{
@@ -43,44 +40,6 @@ abstract class BaseAuthApi implements AuthApiInterface {
   signup: (...args: any) => Promise<any>;
   handle: (...args: any) => Promise<any>;
   silent: UnknownAuthProcess;
-}
-
-export class TokensUtil {
-  private static _instance: TokensUtil;
-  private constructor() {}
-  public static get Instance() {
-    // Do you need arguments? Make it a regular method instead.
-    return this._instance || (this._instance = new this());
-  }
-
-  private static storage: RBAuthBaseStorageMechanism;
-
-  setStorageMechanism(storageMechanism: RBAuthBaseStorageMechanism) {
-    TokensUtil.storage = storageMechanism;
-  }
-
-  setTokens(authTokens: RBAuthTokensType = RBAuthInitialToken) {
-    // TODO: set tokens in async storage or local storage
-    if (TokensUtil.storage) {
-      TokensUtil.storage.Access = authTokens?.accessToken || null;
-      TokensUtil.storage.Refresh = authTokens?.refreshToken || null;
-      TokensUtil.storage.OpenId = authTokens?.idToken || null;
-      TokensUtil.storage.Type = authTokens?.tokenType || null;
-    }
-  }
-
-  static get accessToken() {
-    return TokensUtil.storage.Access;
-  }
-  static get refreshToken() {
-    return TokensUtil.storage.Refresh;
-  }
-  static get idToken() {
-    return TokensUtil.storage.OpenId;
-  }
-  static get tokenType() {
-    return TokensUtil.storage.Type;
-  }
 }
 
 export class BaseAuthApiWrapper extends BaseAuthApi
@@ -117,23 +76,26 @@ export class BaseAuthApiWrapper extends BaseAuthApi
     user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
   }> = (...args: any) =>
     new Promise((resolve, reject) => {
-      this.loginLogic(...args).then((res) => {
-        console.log('BaseAuthApiWrapper login then res: ', res);
-        if (res.tokens && res.user) {
-          TokensUtil.Instance.setTokens(res.tokens);
-          this.authenticate(res.user);
-          resolve(res);
-        } else {
-          reject('');
-        }
-      });
+      this.setReloading(true);
+      this.loginLogic(...args)
+        .then(async (res) => {
+          if (res.tokens && res.user) {
+            console.log('BaseAuthApiWrapper login res.tokens: ', res.tokens);
+            await TokenUtil.setTokens(res.tokens);
+            this.authenticate(res.user);
+            resolve(res);
+          } else {
+            reject('');
+          }
+        })
+        .finally(() => this.finishReload());
     });
 
   logout: UnknownAuthProcess = (...args: any) =>
     new Promise((resolve, reject) => {
       this.startReload(this.logoutLogic(...args))
-        .then((res) => {
-          TokensUtil.Instance.setTokens();
+        .then(async (res) => {
+          await TokenUtil.setTokens();
           this.setAuthenticated(false);
           this.setUser(RBAuthInitialUser);
           resolve(res);
@@ -160,7 +122,7 @@ export class BaseAuthApiWrapper extends BaseAuthApi
   /**
    * Helpers Logic
    */
-  private startReload = (logic: Promise<unknown>) => {
+  private startReload = <T>(logic: T): T => {
     this.setReloading(true);
     return logic;
   };
