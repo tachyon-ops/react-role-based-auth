@@ -7,6 +7,7 @@ import {
 } from 'react-rb-auth';
 
 import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from '@env';
+import { TokenUtil } from 'react-rb-auth';
 
 export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   email: string,
@@ -133,14 +134,10 @@ export class AuthApi implements PartialAuthApi {
 
   static silent = () =>
     new Promise((a, r) => {
-      const tokens: RBAuthTokensType = {
-        accessToken: '', // TokensUtil.getAccessToken(),
-        refreshToken: '', // TokensUtil.getRefreshToken(),
-        openIdToken: '', // TokensUtil.getIdToken(),
-        tokenType: '', // TokensUtil.getTokenType(),
-        expiresIn: '', // TokensUtil.getExpiresIn(),
-        scope: '', // TokensUtil.getScope(),
-      };
+      // this is how you can use your tokens for next session :)
+      const tokens: RBAuthTokensType = TokenUtil.getTokens();
+
+
       setTimeout(() => {
         console.log('going to reject silent', tokens);
         r('silent reject');

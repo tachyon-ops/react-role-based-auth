@@ -141,12 +141,7 @@ export type RBAuthStorageType = {
   tokenType: string;
   expiresIn: string;
   scope: string;
-  setAccessToken: (accesToken?: string) => void;
-  setRefreshToken: (refreshToken?: string) => void;
-  setOpenIdToken: (openIdToken?: string) => void;
-  setTokenType: (openIdToken?: string) => void;
-  setExpiresIn: (expiresIn?: string) => void;
-  setScope: (scope?: string) => void;
+  setTokens: (tokens: RBAuthTokensType) => void;
 };
 
 export {

@@ -1,8 +1,10 @@
 import { AsyncStorage } from 'react-native';
-import { TokenUtil } from '../../../src/lib/authServices/TokenUtilities';
-import { RBAuthStorageType } from 'react-rb-auth';
+import { RBAuthStorageType, TokenUtil, RBAuthTokensType } from 'react-rb-auth';
+
+const TOKENS_KEY = 'react_rb_auth_tokens';
 
 export class AppStorage implements RBAuthStorageType {
+  tokensKey: string;
   accessToken: string = '';
   refreshToken: string = '';
   openIdToken: string = '';
@@ -10,7 +12,8 @@ export class AppStorage implements RBAuthStorageType {
   expiresIn: string = '';
   scope: string = '';
 
-  constructor(setInitiated: (flag: boolean) => void) {
+  constructor(setInitiated: (flag: boolean) => void, tokensKey: string = TOKENS_KEY) {
+    this.tokensKey = tokensKey;
     this.init(setInitiated);
   }
 
@@ -19,37 +22,30 @@ export class AppStorage implements RBAuthStorageType {
   }
 
   async loadTokensFromStorage() {
-    this.accessToken = await AsyncStorage.getItem('access_token');
-    this.refreshToken = await AsyncStorage.getItem('refresh_token');
-    this.openIdToken = await AsyncStorage.getItem('openid_token');
-    this.tokenType = await AsyncStorage.getItem('token_type');
-    this.expiresIn = await AsyncStorage.getItem('expires_in');
-    this.scope = await AsyncStorage.getItem('scope');
+    const tokens = await AsyncStorage.getItem(this.tokensKey);
+    if (tokens && tokens.length > 0) {
+      const t: RBAuthTokensType = JSON.parse(tokens);
+      this.accessToken = t.accessToken;
+      this.refreshToken = t.refreshToken;
+      this.openIdToken = t.openIdToken;
+      this.expiresIn = t.expiresIn;
+      this.scope = t.scope;
+      this.tokenType = t.tokenType;
+    }
 
     TokenUtil.setStorage(this);
   }
 
-  setAccessToken(accessToken: string = '') {
-    return this.setItem('access_token', accessToken);
-  }
-  setRefreshToken(refreshToken: string = '') {
-    return this.setItem('refresh_token', refreshToken);
-  }
-  setOpenIdToken(openIdToken: string = '') {
-    return this.setItem('openid_token', openIdToken);
-  }
-  setTokenType(type: string = '') {
-    return this.setItem('token_type', type);
-  }
-  setExpiresIn(expiresIn: string = '') {
-    return this.setItem('expires_in', expiresIn);
-  }
-  setScope(scope: string = '') {
-    return this.setItem('scope', scope);
+  async setTokens(tokens: RBAuthTokensType) {
+    try {
+      await this.setItem(this.tokensKey, tokens);
+    } catch (e) {
+      console.log('error while saving to your storage: ', e);
+    }
   }
 
-  setItem(key: string, value: string) {
-    console.log(`setting item key: ${key} | value: ${value}`);
-    return AsyncStorage.setItem(key, value);
+  setItem(key: string, value: Object = {}) {
+    if (key && value) return AsyncStorage.setItem(key, JSON.stringify(value));
+    else return;
   }
 }
