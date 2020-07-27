@@ -21,31 +21,42 @@ export class AppStorage implements RBAuthStorageType {
     this.loadTokensFromStorage().then(() => setInitiated(true));
   }
 
-  async loadTokensFromStorage() {
-    const tokens = await AsyncStorage.getItem(this.tokensKey);
-    if (tokens && tokens.length > 0) {
-      const t: RBAuthTokensType = JSON.parse(tokens);
-      this.accessToken = t.accessToken;
-      this.refreshToken = t.refreshToken;
-      this.openIdToken = t.openIdToken;
-      this.expiresIn = t.expiresIn;
-      this.scope = t.scope;
-      this.tokenType = t.tokenType;
+  private async loadTokensFromStorage() {
+    const rawTokens = await AsyncStorage.getItem(this.tokensKey);
+    if (rawTokens && rawTokens.length > 0) {
+      const tokens: RBAuthTokensType = JSON.parse(rawTokens);
+      // console.log('AppStorage::loadTokensFromStorage tokens => ', tokens);
+      // we only save refresh token :)
+      this.refreshToken = tokens.refreshToken;
+      this.accessToken = tokens.accessToken;
+      this.openIdToken = tokens.openIdToken;
+      this.expiresIn = tokens.expiresIn;
+      this.scope = tokens.scope;
+      this.tokenType = tokens.tokenType;
     }
 
     TokenUtil.setStorage(this);
   }
 
   async setTokens(tokens: RBAuthTokensType) {
+    if (tokens.accessToken) this.accessToken = tokens.accessToken;
+    if (tokens.expiresIn) this.expiresIn = tokens.expiresIn;
+    if (tokens.openIdToken) this.openIdToken = tokens.openIdToken;
+    if (tokens.tokenType) this.tokenType = tokens.tokenType;
+    if (tokens.scope) this.scope = tokens.scope;
+    if (tokens.refreshToken) this.refreshToken = tokens.refreshToken;
+
     try {
-      await this.setItem(this.tokensKey, tokens);
+      // define what you want to save
+      await this.setItem(this.tokensKey, { refreshToken: tokens.refreshToken });
     } catch (e) {
       console.log('error while saving to your storage: ', e);
     }
   }
 
-  setItem(key: string, value: Object = {}) {
-    if (key && value) return AsyncStorage.setItem(key, JSON.stringify(value));
+  setItem = async (key: string, value: Object = {}) => {
+    console.log('setting item: ', key, value);
+    if (key && value) return await AsyncStorage.setItem(key, JSON.stringify(value));
     else return;
-  }
+  };
 }

@@ -27,7 +27,6 @@ export const AuthContext = createContext<RBAuthContextType>({
   // store user
   user: RBAuthInitialUser,
   // accessToken of user for Auth0
-  tokens: { accessToken: null, refreshToken: null },
   logic: {
     // login process
     login: async () => console.log('please change initialteLogin'),

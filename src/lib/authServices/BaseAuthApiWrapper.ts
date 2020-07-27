@@ -6,19 +6,21 @@ import {
   RBAuthUserModelWithRole,
   KnownAuthProcess,
 } from '..';
-import { RBAuthInitialUser } from '../roles-based-auth/context';
+import { RBAuthInitialUser, RBAuthInitialToken } from '../roles-based-auth/context';
 import { RBAuthBaseRoles } from '../index';
 import { TokenUtil } from './TokenUtilities';
 
+type AuthProcessResponse = KnownAuthProcess<{
+  tokens: RBAuthTokensType;
+  user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+}>;
+
 type ProcessesType = {
-  login?: KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }>;
+  login?: AuthProcessResponse;
   logout?: UnknownAuthProcess;
   signup?: UnknownAuthProcess;
-  handle?: UnknownAuthProcess;
-  silent?: UnknownAuthProcess;
+  handle?: AuthProcessResponse;
+  silent?: AuthProcessResponse;
 };
 
 const defaultLogicReturnsUser = <R>() =>
@@ -29,38 +31,29 @@ abstract class BaseAuthApi implements AuthApiInterface {
   constructor(
     public setAuthenticated: SetterType,
     public setReloading: SetterType,
-    public setTokens: SetterType,
     public setUser: SetterType
   ) {}
-  login: KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }>;
+  login: AuthProcessResponse;
   logout: (...args: any) => Promise<any>;
   signup: (...args: any) => Promise<any>;
-  handle: (...args: any) => Promise<any>;
-  silent: UnknownAuthProcess;
+  handle: AuthProcessResponse;
+  silent: AuthProcessResponse;
 }
 
-export class BaseAuthApiWrapper extends BaseAuthApi
-  implements AuthApiInterface {
-  private loginLogic: KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }> = defaultLogicReturnsUser;
+export class BaseAuthApiWrapper extends BaseAuthApi implements AuthApiInterface {
+  private loginLogic: AuthProcessResponse = defaultLogicReturnsUser;
   private logoutLogic: UnknownAuthProcess = defaultLogic;
   private signupLogic: UnknownAuthProcess = defaultLogic;
-  private handleLogic: UnknownAuthProcess = defaultLogic;
-  private silentLogic: UnknownAuthProcess = defaultLogicReturnsUser;
+  private handleLogic: AuthProcessResponse = defaultLogicReturnsUser;
+  private silentLogic: AuthProcessResponse = defaultLogicReturnsUser;
 
   constructor(
     setAuthenticated: SetterType,
     setReloading: SetterType,
-    setTokens: SetterType,
     setUser: SetterType,
     processes: ProcessesType
   ) {
-    super(setAuthenticated, setReloading, setTokens, setUser);
+    super(setAuthenticated, setReloading, setUser);
     if (!processes) return;
     if (processes.login) this.loginLogic = processes.login;
     if (processes.logout) this.logoutLogic = processes.logout;
@@ -69,73 +62,49 @@ export class BaseAuthApiWrapper extends BaseAuthApi
     if (processes.silent) this.silentLogic = processes.silent;
   }
 
+  login: AuthProcessResponse = async (...args: any) => this.runLogic(this.loginLogic)(...args);
   signup: UnknownAuthProcess = (...args: any) => this.signupLogic(...args);
-
-  login: KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }> = (...args: any) =>
-    new Promise((resolve, reject) => {
-      this.setReloading(true);
-      this.loginLogic(...args)
-        .then(async (res) => {
-          if (res.tokens && res.user) {
-            console.log('BaseAuthApiWrapper login res.tokens: ', res.tokens);
-            await TokenUtil.setTokens(res.tokens);
-            this.authenticate(res.user);
-            resolve(res);
-          } else {
-            reject('');
-          }
-        })
-        .finally(() => this.finishReload());
-    });
-
-  logout: UnknownAuthProcess = (...args: any) =>
-    new Promise((resolve, reject) => {
-      this.startReload(this.logoutLogic(...args))
-        .then(async (res) => {
-          await TokenUtil.setTokens();
-          this.setAuthenticated(false);
-          this.setUser(RBAuthInitialUser);
-          resolve(res);
-        })
-        .catch(reject) // no need to logout on error right?
-        .finally(this.finishReload);
-    });
-
-  handle: UnknownAuthProcess = (...args: any) =>
-    this.startReload(this.handleLogic(...args))
-      .then(this.authenticate)
-      .catch((e) => {
-        this.setAuthenticated(false);
-        this.setUser(RBAuthInitialUser);
-        return e;
-      })
-      .finally(this.finishReload);
-
-  silent: UnknownAuthProcess = (...args: any) =>
-    this.startReload(this.silentLogic(...args))
-      .then(this.authenticate)
-      .finally(this.finishReload);
+  logout: UnknownAuthProcess = async (...args: any) => {
+    this.setReloading(true);
+    const res = await this.logoutLogic(...args);
+    this.authenticate();
+    return res;
+  };
+  handle: AuthProcessResponse = async (...args: any) => this.runLogic(this.handleLogic)(...args);
+  silent: AuthProcessResponse = async (...args: any) => this.runLogic(this.silentLogic)(...args);
 
   /**
    * Helpers Logic
    */
-  private startReload = <T>(logic: T): T => {
-    this.setReloading(true);
-    return logic;
-  };
-  private finishReload = () => this.setReloading(false);
 
-  private authenticate = <T>(user: T = null) => {
-    if (user) {
+  private runLogic = (logic: AuthProcessResponse) => async (
+    ...args: any
+  ): Promise<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }> => {
+    this.setReloading(true);
+    const res = await logic(...args);
+    await this.authenticate(res);
+    return res;
+  };
+
+  private authenticate = async (
+    res: {
+      tokens: RBAuthTokensType;
+      user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+    } = null
+  ) => {
+    if (res && res.user && res.tokens) {
       this.setAuthenticated(true);
-      this.setUser(user);
+      this.setUser(res.user);
+      await TokenUtil.setTokens(res.tokens);
     } else {
       this.setAuthenticated(false);
       this.setUser(RBAuthInitialUser);
+      await TokenUtil.setTokens(RBAuthInitialToken);
     }
+    this.setReloading(false);
   };
 }
 
@@ -143,10 +112,9 @@ export class AuthApiForContext extends BaseAuthApiWrapper {
   constructor(
     setAuthenticated: SetterType,
     setReloading: SetterType,
-    setTokens: SetterType,
     setUser: SetterType,
     authApi: Partial<AuthApiInterface>
   ) {
-    super(setAuthenticated, setReloading, setTokens, setUser, authApi);
+    super(setAuthenticated, setReloading, setUser, authApi);
   }
 }

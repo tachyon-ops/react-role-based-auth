@@ -19,9 +19,7 @@ export class TokenUtil {
     TokenUtil.s = storage;
   }
 
-  static async setTokens(t: RBAuthTokensType = RBAuthInitialToken) {
-    return TokenUtil.s.setTokens(t);
-  }
+  static setTokens = (t: RBAuthTokensType = RBAuthInitialToken) => TokenUtil.s.setTokens(t);
 
   static getTokens(): RBAuthTokensType {
     return {

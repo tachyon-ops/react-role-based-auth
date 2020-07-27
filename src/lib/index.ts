@@ -64,7 +64,6 @@ export type RBAuthContextType<
   isAuth: boolean; // to check if authenticated or not
   reloading: boolean;
   user: TUser; // store all the user details
-  tokens: Partial<RBAuthTokensType>; // accessToken of user for Auth0
   logic: {
     login: LoginType; // to start the login process
     signup: SignUpType;
@@ -116,8 +115,14 @@ export interface AuthApiInterface {
   }>;
   logout: UnknownAuthProcess;
   signup: UnknownAuthProcess;
-  handle: UnknownAuthProcess;
-  silent: UnknownAuthProcess;
+  handle: KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
+  silent: KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
 }
 export type PartialAuthApi = Partial<AuthApiInterface>;
 
@@ -134,6 +139,12 @@ export type RBAuthLoginResponse<TUser extends RBAuthUserModelWithRole<string>> =
   user: Partial<TUser> & RBAuthUserModelWithRole<string>;
 };
 
+/**
+ * RBAuthStorageType
+ * @implNote
+ * If you create any 'get Tokens' functionality, please make it private, either by using ES6 classes or
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#Emulating_private_methods_with_closures
+ */
 export type RBAuthStorageType = {
   accessToken: string;
   refreshToken: string;

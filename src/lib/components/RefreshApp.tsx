@@ -17,15 +17,17 @@ export const RefreshApp: React.FC<{
     else setIsReloading(false);
   }, [auth.reloading, props.AuthLoadingComp]);
 
+  const silentSwallow = () => null;
+
   useEffect(() => {
     if (firstAuthCheck) {
-      if (props.locationPathName !== props.authCallbackRoute) {
+      if (props.locationPathName !== props.authCallbackRoute)
         auth.logic
           .silent()
-          .then(console.log)
-          .catch(console.log)
+          .then(silentSwallow)
+          .catch(silentSwallow)
           .finally(() => setFirstAuthCheck(false));
-      } else setFirstAuthCheck(false);
+      else setFirstAuthCheck(false);
     }
   }, [firstAuthCheck]);
 

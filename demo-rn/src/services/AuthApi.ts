@@ -8,6 +8,8 @@ import {
 
 import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from '@env';
 import { TokenUtil } from 'react-rb-auth';
+import { RBAuthInitialUser } from '../../../src/lib/roles-based-auth/context';
+import { UserModel } from '../../../src/demo/models/user';
 
 export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   email: string,
@@ -50,97 +52,144 @@ const TEST_TIMEOUT = 2000;
 
 // api docs: https://auth0.com/docs/api/authentication#revoke-refresh-token
 
+class RequestBuilder {
+  private route: string;
+  private body: object;
+  private headers: Headers;
+  private method: HTTPMethod = HTTPMethod.GET;
+
+  constructor(route: string) {
+    this.route = route;
+    return this;
+  }
+  withAuth0Body(body: object) {
+    this.body = { ...body, client_id: AUTH0_CLIENT_ID, audience: AUTH0_AUDIENCE };
+    return this;
+  }
+  withBody(body) {
+    this.body = body;
+    return this;
+  }
+  withHeaders(headers: Headers) {
+    this.headers = headers;
+    return this;
+  }
+  withMethod(method: HTTPMethod) {
+    this.method = method;
+    return this;
+  }
+  async build<T>(): Promise<T> {
+    return fetch(this.route, {
+      method: this.method,
+      headers: this.headers,
+      body: JSON.stringify(this.body),
+    }).then((res) => res.json());
+  }
+}
+
+class Auth0Request {
+  private static connection = 'Username-Password-Authentication';
+  // openid for id token
+  // offline_access for refresh token
+  private static scope = 'profile openid offline_access';
+
+  static authorize = (username: string, password: string): Promise<RawTokensType> =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/token`)
+      .withMethod(HTTPMethod.POST)
+      .withHeaders(new HeadersBuilder().withContentTypeJson().build())
+      .withAuth0Body({
+        connection: Auth0Request.connection,
+        scope: Auth0Request.scope,
+        grant_type: 'password',
+        username,
+        password,
+      })
+      .build();
+
+  static refresh = async (refreshToken: string): Promise<RawTokensType> =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/token`)
+      .withMethod(HTTPMethod.POST)
+      .withHeaders(new HeadersBuilder().withContentTypeJson().build())
+      .withAuth0Body({ grant_type: 'refresh_token', refresh_token: refreshToken })
+      .build();
+
+  static logout = () => new RequestBuilder(`https://${AUTH0_DOMAIN}/v2/logout?federated=`).build();
+
+  static revoke = (tokens: RBAuthTokensType) =>
+    tokens.refreshToken &&
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/revoke`)
+      .withMethod(HTTPMethod.POST)
+      .withAuth0Body({
+        refresh_token: tokens.refreshToken,
+      })
+      .build();
+
+  static signup = (name: string, email: string, password: string) =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/dbconnections/signup`)
+      .withMethod(HTTPMethod.POST)
+      .withHeaders(new HeadersBuilder().withContentTypeJson().build())
+      .withAuth0Body({
+        connection: Auth0Request.connection,
+        scope: Auth0Request.scope,
+        grant_type: 'password',
+        device: 'mydevice',
+        email,
+        name,
+        password,
+      })
+      .build();
+
+  static getUser = <U>(tokenType: string, accessToken: string): Promise<U> =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
+      .withMethod(HTTPMethod.POST)
+      .withHeaders(
+        new HeadersBuilder().withContentTypeJson().withToken(tokenType, accessToken).build()
+      )
+      .build();
+}
+
 export class AuthApi implements PartialAuthApi {
   static login: LoginType = async (username: string, password: string) =>
-    new Promise(async (resolve, reject) => {
-      try {
-        await fetch(`https://${AUTH0_DOMAIN}/oauth/token`, {
-          method: HTTPMethod.POST,
-          headers: new HeadersBuilder().withContentTypeJson().build(),
-          body: JSON.stringify({
-            grant_type: 'password',
-            client_id: AUTH0_CLIENT_ID,
-            audience: AUTH0_AUDIENCE,
-            connection: 'Username-Password-Authentication',
-            username,
-            password,
-            // openid for id token
-            // offline_access for refresh token
-            scope: 'profile openid offline_access',
-          }),
-        }).then(async (res) => {
-          if (!res.ok) reject(res.statusText);
-          else {
-            const rawTokens = await res.json();
-            console.log('raw tokens: ', rawTokens);
-            const tokens: RBAuthTokensType = mapRawTokens(rawTokens);
-            const userRes = await fetch(`https://${AUTH0_DOMAIN}/userinfo`, {
-              method: HTTPMethod.POST,
-              headers: new HeadersBuilder()
-                .withContentTypeJson()
-                .withToken(tokens.tokenType, tokens.accessToken)
-                .build(),
-            });
-            const user = await userRes.json();
-            // resolve tokens & user
-            resolve({ tokens, user });
-          }
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
+    AuthApi.authorizeWithTokensAndUser(
+      mapRawTokens(await Auth0Request.authorize(username, password))
+    );
 
   // https://auth0.com/docs/logout
-  static logout = () =>
-    new Promise(async (resolve, reject) => {
-      const res = await fetch(`https://${AUTH0_DOMAIN}/v2/logout?federated= `);
-      if (res.ok) resolve(res);
-      else reject({ status: res.status, statusText: res.statusText });
-    });
-
-  static signup: SignupType = async (name, email, password) => {
-    console.log('going to signup!', name, email, password);
-    try {
-      let auth0Domain = `https://${AUTH0_DOMAIN}/dbconnections/signup`;
-      const response = await fetch(auth0Domain, {
-        method: HTTPMethod.POST,
-        headers: new HeadersBuilder().withContentTypeJson().build(),
-        body: JSON.stringify({
-          client_id: AUTH0_CLIENT_ID,
-          connection: 'Username-Password-Authentication',
-          grant_type: 'password',
-          scope: 'openid offline_access',
-          device: 'mydevice',
-          email,
-          name,
-          password,
-        }),
-      });
-      return await response.json();
-    } catch (e) {
-      console.log(e);
-      throw e;
-    }
+  static logout = async () => {
+    Auth0Request.revoke(TokenUtil.getTokens());
+    return await Auth0Request.logout();
   };
 
+  static signup: SignupType = Auth0Request.signup;
+
   static handle = () =>
-    new Promise((a, r) =>
+    new Promise((a, r) => {
+      console.log('handle logic');
       setTimeout(() => {
         console.log('going to reject handle');
         r('handle reject');
-      }, TEST_TIMEOUT)
-    );
-
-  static silent = () =>
-    new Promise((a, r) => {
-      // this is how you can use your tokens for next session :)
-      const tokens: RBAuthTokensType = TokenUtil.getTokens();
-
-
-      setTimeout(() => {
-        console.log('going to reject silent', tokens);
-        r('silent reject');
       }, TEST_TIMEOUT);
     });
+
+  static silent = async () => {
+    const { refreshToken } = TokenUtil.getTokens();
+    if (!refreshToken) return;
+    const rawTokens = await Auth0Request.refresh(refreshToken);
+    const tokens = mapRawTokens(rawTokens);
+    if (!tokens.refreshToken) tokens.refreshToken = refreshToken;
+    const res = await AuthApi.authorizeWithTokensAndUser(tokens);
+    return res;
+  };
+
+  /**
+   * Helpers
+   */
+  private static authorizeWithTokensAndUser = async <
+    U extends RBAuthUserModelWithRole<RBAuthBaseRoles>
+  >(
+    tokens: RBAuthTokensType
+  ): Promise<{
+    user: U;
+    tokens: RBAuthTokensType;
+  }> => ({ tokens, user: await Auth0Request.getUser(tokens.tokenType, tokens.accessToken) });
 }
