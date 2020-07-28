@@ -4,6 +4,11 @@ export class HeadersBuilder {
     return this;
   }
 
+  withKeyValuePair(key: string, value: string) {
+    this.headers.append(key, value);
+    return this;
+  }
+
   withContentTypeJson() {
     this.headers.append('Content-Type', 'application/json');
     return this;

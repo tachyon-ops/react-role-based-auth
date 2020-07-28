@@ -4,12 +4,12 @@ import {
   RBAuthUserModelWithRole,
   RBAuthBaseRoles,
   HeadersBuilder,
+  RequestBuilder,
+  HTTPMethod,
 } from 'react-rb-auth';
 
 import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from '@env';
-import { TokenUtil } from 'react-rb-auth';
-import { RBAuthInitialUser } from '../../../src/lib/roles-based-auth/context';
-import { UserModel } from '../../../src/demo/models/user';
+import { TokenUtil, RBAuthInitialToken } from 'react-rb-auth';
 
 export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   email: string,
@@ -22,14 +22,6 @@ export type LogoutType = (email: string, password: string) => Promise<unknown>;
 export type SignupType = (name: string, email: string, password: string) => Promise<unknown>;
 export type HandleType = () => Promise<unknown>;
 export type SilentType = () => Promise<unknown>;
-
-enum HTTPMethod {
-  POST = 'POST',
-  GET = 'GET',
-  PATCH = 'PATCH',
-  PUT = 'PUT',
-  DELETE = 'DELETE',
-}
 
 type RawTokensType = {
   access_token: string;
@@ -52,83 +44,58 @@ const TEST_TIMEOUT = 2000;
 
 // api docs: https://auth0.com/docs/api/authentication#revoke-refresh-token
 
-class RequestBuilder {
-  private route: string;
-  private body: object;
-  private headers: Headers;
-  private method: HTTPMethod = HTTPMethod.GET;
-
-  constructor(route: string) {
-    this.route = route;
-    return this;
-  }
-  withAuth0Body(body: object) {
-    this.body = { ...body, client_id: AUTH0_CLIENT_ID, audience: AUTH0_AUDIENCE };
-    return this;
-  }
-  withBody(body) {
-    this.body = body;
-    return this;
-  }
-  withHeaders(headers: Headers) {
-    this.headers = headers;
-    return this;
-  }
-  withMethod(method: HTTPMethod) {
-    this.method = method;
-    return this;
-  }
-  async build<T>(): Promise<T> {
-    return fetch(this.route, {
-      method: this.method,
-      headers: this.headers,
-      body: JSON.stringify(this.body),
-    }).then((res) => res.json());
-  }
-}
-
 class Auth0Request {
   private static connection = 'Username-Password-Authentication';
   // openid for id token
   // offline_access for refresh token
   private static scope = 'profile openid offline_access';
 
+  private static auth0body = { client_id: AUTH0_CLIENT_ID, audience: AUTH0_AUDIENCE };
+
   static authorize = (username: string, password: string): Promise<RawTokensType> =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/token`)
       .withMethod(HTTPMethod.POST)
       .withHeaders(new HeadersBuilder().withContentTypeJson().build())
       .withAuth0Body({
+        ...Auth0Request.auth0body,
         connection: Auth0Request.connection,
         scope: Auth0Request.scope,
         grant_type: 'password',
         username,
         password,
       })
-      .build();
+      .buildJson();
 
   static refresh = async (refreshToken: string): Promise<RawTokensType> =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/token`)
       .withMethod(HTTPMethod.POST)
       .withHeaders(new HeadersBuilder().withContentTypeJson().build())
-      .withAuth0Body({ grant_type: 'refresh_token', refresh_token: refreshToken })
-      .build();
+      .withBody({
+        grant_type: 'refresh_token',
+        client_id: AUTH0_CLIENT_ID,
+        refresh_token: refreshToken,
+      })
+      .buildJson();
 
-  static logout = () => new RequestBuilder(`https://${AUTH0_DOMAIN}/v2/logout?federated=`).build();
+  static logout = () =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/v2/logout?federated=`).buildText();
 
   static revoke = (tokens: RBAuthTokensType) =>
     tokens.refreshToken &&
     new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/revoke`)
       .withMethod(HTTPMethod.POST)
       .withAuth0Body({
+        ...Auth0Request.auth0body,
         refresh_token: tokens.refreshToken,
       })
-      .build();
+      .buildJson();
 
   static signup = (name: string, email: string, password: string) =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/dbconnections/signup`)
       .withMethod(HTTPMethod.POST)
       .withHeaders(new HeadersBuilder().withContentTypeJson().build())
       .withAuth0Body({
+        ...Auth0Request.auth0body,
         connection: Auth0Request.connection,
         scope: Auth0Request.scope,
         grant_type: 'password',
@@ -137,14 +104,18 @@ class Auth0Request {
         name,
         password,
       })
-      .build();
+      .buildJson();
 
   static getUser = <U>(tokenType: string, accessToken: string): Promise<U> =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
-      .withMethod(HTTPMethod.POST)
-      .withHeaders(
-        new HeadersBuilder().withContentTypeJson().withToken(tokenType, accessToken).build()
-      )
+      .withMethod(HTTPMethod.GET)
+      .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
+      .buildJson();
+
+  static getRefreshedUser = <U>(tokenType: string, accessToken: string): Promise<Response> =>
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
+      .withMethod(HTTPMethod.GET)
+      .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
       .build();
 }
 
@@ -155,30 +126,25 @@ export class AuthApi implements PartialAuthApi {
     );
 
   // https://auth0.com/docs/logout
-  static logout = async () => {
-    Auth0Request.revoke(TokenUtil.getTokens());
-    return await Auth0Request.logout();
-  };
+  static logout = () => Auth0Request.logout();
 
-  static signup: SignupType = Auth0Request.signup;
+  static signup: SignupType = (name, email, password) => Auth0Request.signup(name, email, password);
 
-  static handle = () =>
-    new Promise((a, r) => {
-      console.log('handle logic');
-      setTimeout(() => {
-        console.log('going to reject handle');
-        r('handle reject');
-      }, TEST_TIMEOUT);
-    });
+  static getUser = (t: RBAuthTokensType) =>
+    new Promise((r) =>
+      setTimeout(async () => {
+        const result = await Auth0Request.getRefreshedUser(t.tokenType, t.accessToken);
+        if (result.ok) r(await result.json());
+        r(result);
+      }, 2000)
+    );
 
-  static silent = async () => {
+  static silent: SilentType = async () => {
     const { refreshToken } = TokenUtil.getTokens();
-    if (!refreshToken) return;
-    const rawTokens = await Auth0Request.refresh(refreshToken);
-    const tokens = mapRawTokens(rawTokens);
-    if (!tokens.refreshToken) tokens.refreshToken = refreshToken;
-    const res = await AuthApi.authorizeWithTokensAndUser(tokens);
-    return res;
+    if (!refreshToken) return { tokens: RBAuthInitialToken, user: null };
+    return AuthApi.authorizeWithTokensAndUser(
+      mapRawTokens(await Auth0Request.refresh(refreshToken))
+    );
   };
 
   /**

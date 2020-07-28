@@ -9,8 +9,9 @@ import { SecureScreen } from './components/SecureScreen';
 import { AuthApiForContext } from './authServices/BaseAuthApiWrapper';
 import { HeadersBuilder } from './authServices/HeadersUtil';
 // roles
-import { AuthContext } from './roles-based-auth/context';
+import { AuthContext, RBAuthInitialToken } from './roles-based-auth/context';
 import { TokenUtil } from './authServices/TokenUtilities';
+import { RequestBuilder, HTTPMethod } from './authServices/RequestBuilder';
 
 /**
  * SecureRoute Types
@@ -164,4 +165,7 @@ export {
   AuthCallback,
   TokenUtil,
   HeadersBuilder,
+  RequestBuilder,
+  HTTPMethod,
+  RBAuthInitialToken,
 };
