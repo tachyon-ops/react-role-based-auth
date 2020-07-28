@@ -11,17 +11,19 @@ import {
 import { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_AUDIENCE } from '@env';
 import { TokenUtil, RBAuthInitialToken } from 'react-rb-auth';
 
+type AuthResObj<U = RBAuthUserModelWithRole<RBAuthBaseRoles>> = {
+  tokens: RBAuthTokensType;
+  user: U;
+};
+
 export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   email: string,
   password: string
-) => Promise<{
-  user: U;
-  tokens: RBAuthTokensType;
-}>;
+) => Promise<AuthResObj<U>>;
+export type SilentType = () => Promise<AuthResObj>;
+export type HandleType = () => Promise<unknown>;
 export type LogoutType = (email: string, password: string) => Promise<unknown>;
 export type SignupType = (name: string, email: string, password: string) => Promise<unknown>;
-export type HandleType = () => Promise<unknown>;
-export type SilentType = () => Promise<unknown>;
 
 type RawTokensType = {
   access_token: string;
@@ -110,49 +112,32 @@ class Auth0Request {
     new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
       .withMethod(HTTPMethod.GET)
       .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
-      .buildJson();
-
-  static getRefreshedUser = <U>(tokenType: string, accessToken: string): Promise<Response> =>
-    new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
-      .withMethod(HTTPMethod.GET)
-      .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
-      .build();
+      .buildJson() || null;
 }
 
 export class AuthApi implements PartialAuthApi {
   static login: LoginType = async (username: string, password: string) =>
-    AuthApi.authorizeWithTokensAndUser(
-      mapRawTokens(await Auth0Request.authorize(username, password))
+    AuthApi.authWrapper(mapRawTokens(await Auth0Request.authorize(username, password)));
+
+  static silent: SilentType = async () =>
+    AuthApi.authWrapper(
+      mapRawTokens(await Auth0Request.refresh(TokenUtil.getTokens().refreshToken))
     );
+
+  // TODO: test handle (web based only)
 
   // https://auth0.com/docs/logout
-  static logout = () => Auth0Request.logout();
+  static logout = () => {
+    Auth0Request.revoke(TokenUtil.getTokens());
+    return Auth0Request.logout();
+  };
 
   static signup: SignupType = (name, email, password) => Auth0Request.signup(name, email, password);
-
-  static getUser = (t: RBAuthTokensType) =>
-    new Promise((r) =>
-      setTimeout(async () => {
-        const result = await Auth0Request.getRefreshedUser(t.tokenType, t.accessToken);
-        if (result.ok) r(await result.json());
-        r(result);
-      }, 2000)
-    );
-
-  static silent: SilentType = async () => {
-    const { refreshToken } = TokenUtil.getTokens();
-    if (!refreshToken) return { tokens: RBAuthInitialToken, user: null };
-    return AuthApi.authorizeWithTokensAndUser(
-      mapRawTokens(await Auth0Request.refresh(refreshToken))
-    );
-  };
 
   /**
    * Helpers
    */
-  private static authorizeWithTokensAndUser = async <
-    U extends RBAuthUserModelWithRole<RBAuthBaseRoles>
-  >(
+  private static authWrapper = async <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
     tokens: RBAuthTokensType
   ): Promise<{
     user: U;
