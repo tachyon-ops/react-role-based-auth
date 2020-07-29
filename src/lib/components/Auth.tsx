@@ -1,32 +1,26 @@
 import React from 'react';
 
-import {
-  AuthApiInterface,
-  RBAuthUserModelWithRole,
-  RBAuthBaseRoles,
-  RBAuthContextType,
-} from '..';
-import { AuthApiForContext } from '../authServices/BaseAuthApiWrapper';
+import { RBAuthUserModelWithRole, RBAuthBaseRoles, RBAuthContextType } from '..';
+import { BaseAuthApiWrapper } from '../authServices/BaseAuthApiWrapper';
 import { AuthContext, RBAuthInitialUser } from '../roles-based-auth/context';
+import { PartialAuthApi } from '../index';
 
 export const Auth: React.FC<{
-  api: AuthApiInterface;
+  api: PartialAuthApi;
   routes?: { private: string; public: string };
 }> = ({ children, api, routes }) => {
-  const [auth, setAuth] = React.useState(false);
+  // const [auth, setAuth] = React.useState(false);
   const [reloading, setReloading] = React.useState(true);
-  const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles>>(
-    RBAuthInitialUser
-  );
+  const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles>>(null);
 
-  const logic = new AuthApiForContext(setAuth, setReloading, setUser, api);
+  const logic = new BaseAuthApiWrapper(setReloading, setUser, api);
 
   const contextVal: RBAuthContextType = {
-    isAuth: auth,
+    isAuth: !!user,
     reloading,
     logic,
     routes,
-    user,
+    user: user || RBAuthInitialUser,
     rules: {
       admin: {},
       public: {},

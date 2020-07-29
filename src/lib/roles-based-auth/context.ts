@@ -29,14 +29,15 @@ export const AuthContext = createContext<RBAuthContextType>({
   // accessToken of user for Auth0
   logic: {
     // login process
-    login: async () => console.log('please change initialteLogin'),
+    login: async () => console.log('please change login'),
     // signup process
-    signup: async () => console.log('please change initialteLogin'),
+    signup: async () => console.log('please change signup'),
     // logout the user
     logout: async () => console.log('please change logout'),
-    silent: async () => console.log('please change silentAuth'),
+    silent: async () => console.log('please change silent'),
     // handle Auth0 login process
-    handle: async () => console.log('please change handleAuthentication'),
+    handle: async () => console.log('please change handle'),
+    refresh: async () => console.log('please change refresh'),
   },
   routes: {
     public: '/',

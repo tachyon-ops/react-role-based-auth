@@ -47,8 +47,11 @@ export class AppStorage implements RBAuthStorageType {
     if (tokens.refreshToken) this.refreshToken = tokens.refreshToken;
 
     try {
-      // define what you want to save
-      await this.setItem(this.tokensKey, { refreshToken: tokens.refreshToken });
+      // saving is up to you but you should only save what you need
+      const valueToSave = {
+        refreshToken: tokens.refreshToken,
+      };
+      await this.setItem(this.tokensKey, valueToSave);
     } catch (e) {
       console.log('error while saving to your storage: ', e);
     }

@@ -6,12 +6,12 @@ import { AuthCallback } from './components/AuthCallback';
 import { RefreshApp } from './components/RefreshApp';
 import { SecureScreen } from './components/SecureScreen';
 // services
-import { AuthApiForContext } from './authServices/BaseAuthApiWrapper';
 import { HeadersBuilder } from './authServices/HeadersUtil';
 // roles
 import { AuthContext, RBAuthInitialToken } from './roles-based-auth/context';
 import { TokenUtil } from './authServices/TokenUtilities';
 import { RequestBuilder, HTTPMethod } from './authServices/RequestBuilder';
+import { ApiAccessBuilder } from './authServices/RequestWrapper';
 
 /**
  * SecureRoute Types
@@ -51,6 +51,7 @@ export interface RBAuthUserModelWithRole<T extends string = RBAuthBaseRoles> {
  */
 export type KnownAuthProcess<R> = (...args: any) => Promise<R>;
 export type UnknownAuthProcess = <R>(...args: any) => Promise<R | unknown | void>;
+export type UnknownRefreshProcess = <R>(reloadFlag?: boolean) => Promise<R | unknown | void>;
 
 // Auth Context type
 export type RBAuthContextType<
@@ -60,7 +61,8 @@ export type RBAuthContextType<
   LogOutType = UnknownAuthProcess,
   SignUpType = UnknownAuthProcess,
   SilentAuthType = UnknownAuthProcess,
-  HandleAuthType = UnknownAuthProcess
+  HandleAuthType = UnknownAuthProcess,
+  RefreshTokens = UnknownRefreshProcess
 > = {
   isAuth: boolean; // to check if authenticated or not
   reloading: boolean;
@@ -71,6 +73,7 @@ export type RBAuthContextType<
     silent: SilentAuthType;
     handle: HandleAuthType; // handle Auth0 login process
     logout: LogOutType; // logout the user
+    refresh: RefreshTokens;
   };
   routes: {
     public: string;
@@ -158,7 +161,6 @@ export type RBAuthStorageType = {
 
 export {
   AuthContext,
-  AuthApiForContext,
   Auth,
   RefreshApp,
   SecureScreen,
@@ -167,5 +169,6 @@ export {
   HeadersBuilder,
   RequestBuilder,
   HTTPMethod,
+  ApiAccessBuilder,
   RBAuthInitialToken,
 };

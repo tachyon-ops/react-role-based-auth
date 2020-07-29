@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFonts } from 'expo-font';
-import { Text, View } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 
 export const AssetsLoader: React.FC = ({ children }) => {
   const [loaded, error] = useFonts({
@@ -18,7 +18,7 @@ export const AssetsLoader: React.FC = ({ children }) => {
     );
   }
   if (!loaded) {
-    return null;
+    return <ActivityIndicator />;
   }
 
   return <>{children}</>;
