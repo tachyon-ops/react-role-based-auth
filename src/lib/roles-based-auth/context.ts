@@ -38,6 +38,7 @@ export const AuthContext = createContext<RBAuthContextType>({
     // handle Auth0 login process
     handle: async () => console.log('please change handle'),
     refresh: async () => console.log('please change refresh'),
+    apis: {},
   },
   routes: {
     public: '/',
@@ -54,4 +55,4 @@ export const AuthContext = createContext<RBAuthContextType>({
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}) as RBAuthReactContext<any, any, any>;
+}) as RBAuthReactContext<any, any, any, any, any, any, any, any, any>;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   UnknownAuthProcess,
   SetterType,
@@ -5,10 +6,13 @@ import {
   RBAuthTokensType,
   RBAuthUserModelWithRole,
   KnownAuthProcess,
+  RBAuthErrors,
+  ApiAccessBuilder,
 } from '..';
-import { RBAuthInitialUser, RBAuthInitialToken } from '../roles-based-auth/context';
+import { RBAuthInitialToken } from '../roles-based-auth/context';
 import { RBAuthBaseRoles } from '../index';
 import { TokenUtil } from './TokenUtilities';
+import { isObject, isFunction } from 'util';
 
 type AuthProcessResponse = KnownAuthProcess<{
   tokens: RBAuthTokensType;
@@ -17,33 +21,72 @@ type AuthProcessResponse = KnownAuthProcess<{
 
 type RefreshProcessResponse = KnownAuthProcess<RBAuthTokensType>;
 
-type ProcessesType = {
-  login?: AuthProcessResponse;
-  logout?: UnknownAuthProcess;
-  signup?: UnknownAuthProcess;
-  handle?: AuthProcessResponse;
-  silent?: AuthProcessResponse;
-  refresh?: RefreshProcessResponse;
+type ProcessesType<
+  TLoging,
+  LogOutType,
+  SignUpType,
+  SilentAuthType,
+  HandleAuthType,
+  RefreshTokens
+> = {
+  login?: TLoging;
+  logout?: LogOutType;
+  signup?: SignUpType;
+  silent?: SilentAuthType;
+  handle?: HandleAuthType;
+  refresh?: RefreshTokens;
 };
-
-const defaultLogicReturnsUser = <R>() =>
-  new Promise((r) => r((RBAuthInitialUser as unknown) as R)) as Promise<R>;
-const defaultLogic = () => new Promise((r) => r({}));
 
 abstract class UserReloader {
   constructor(public setReloading: SetterType, public setUser: SetterType) {}
 }
 
-export class BaseAuthApiWrapper extends UserReloader implements AuthApiInterface {
-  private loginLogic: AuthProcessResponse = defaultLogicReturnsUser;
-  private logoutLogic: UnknownAuthProcess = defaultLogic;
-  private signupLogic: UnknownAuthProcess = defaultLogic;
-  private handleLogic: AuthProcessResponse = defaultLogicReturnsUser;
-  private silentLogic: AuthProcessResponse = defaultLogicReturnsUser;
-  private refreshLogic: RefreshProcessResponse = defaultLogicReturnsUser;
+type RefreshTokenEndLifeCallbackType = (rbAuthErros: RBAuthErrors, error?: Error) => void;
 
-  constructor(setReloading: SetterType, setUser: SetterType, processes: ProcessesType) {
+export class BaseAuthApiWrapper<
+  LoginType extends KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>,
+  LogOutType extends UnknownAuthProcess,
+  SignUpType extends KnownAuthProcess<unknown>,
+  SilentType extends KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>,
+  HandleType extends KnownAuthProcess<{
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>,
+  RefreshType extends KnownAuthProcess<RBAuthTokensType>,
+  AppApis extends Record<string, unknown>
+> extends UserReloader implements AuthApiInterface {
+  private loginLogic: LoginType;
+  private logoutLogic: LogOutType;
+  private signupLogic: SignUpType;
+  private silentLogic: SilentType;
+  private handleLogic: HandleType;
+  private refreshLogic: RefreshType;
+  private errorCallback: RefreshTokenEndLifeCallbackType = () => null;
+  private appApis: Record<string, unknown> = {};
+
+  constructor(
+    setReloading: SetterType,
+    setUser: SetterType,
+    processes: ProcessesType<
+      LoginType,
+      LogOutType,
+      SignUpType,
+      SilentType,
+      HandleType,
+      RefreshType
+    >,
+    refreshTokenEndLifeCallback?: RefreshTokenEndLifeCallbackType,
+    appApis?: AppApis
+  ) {
     super(setReloading, setUser);
+    if (refreshTokenEndLifeCallback) this.errorCallback = refreshTokenEndLifeCallback;
+    if (appApis) this.appApis = this.embedWrapperLogicIntoApis(appApis);
     if (!processes) return;
     if (processes.login) this.loginLogic = processes.login;
     if (processes.logout) this.logoutLogic = processes.logout;
@@ -51,6 +94,10 @@ export class BaseAuthApiWrapper extends UserReloader implements AuthApiInterface
     if (processes.handle) this.handleLogic = processes.handle;
     if (processes.silent) this.silentLogic = processes.silent;
     if (processes.refresh) this.refreshLogic = processes.refresh;
+  }
+
+  public get apis(): Record<string, unknown> {
+    return this.appApis;
   }
 
   login: AuthProcessResponse = async (...args: any) => this.runLogic(this.loginLogic)(...args);
@@ -68,9 +115,21 @@ export class BaseAuthApiWrapper extends UserReloader implements AuthApiInterface
     });
 
   /**
-   * private
-   * Helpers Logic
+   * private Helpers
    */
+  private embedWrapperLogicIntoApis(apis: AppApis) {
+    const result = {};
+    Object.keys(apis).forEach((item) => {
+      if (item.startsWith('logic') && apis[item] && isFunction(apis[item]))
+        result[item] = this.apiWrap(apis[item] as <T>() => Promise<T>);
+      else if (isObject(apis[item]))
+        result[item] = this.embedWrapperLogicIntoApis(apis[item] as AppApis);
+      else result[item] = apis[item];
+    });
+    console.log('embedWrapperLogicIntoApis: ', result);
+    return result;
+  }
+
   private runLogic = (logic: AuthProcessResponse) => async (
     ...args: any
   ): Promise<{
@@ -79,6 +138,7 @@ export class BaseAuthApiWrapper extends UserReloader implements AuthApiInterface
   }> =>
     this.wrap(async () => {
       const res = await logic(...args);
+      console.log('res', res);
       await this.authenticate(res);
       return res;
     });
@@ -90,15 +150,64 @@ export class BaseAuthApiWrapper extends UserReloader implements AuthApiInterface
       return res;
     }, flag);
 
-  private wrap = <T>(logic: () => T, flag: boolean = true) => {
+  // this means the access token got krazy!
+  private accessTokenError = RBAuthErrors.UNAUTHORIZED;
+  private refreshTokenError = RBAuthErrors.INVALID_GRANT;
+
+  private apiWrap = (logic: <T>() => Promise<T>) => (
+    onSuccess: <T>(arg: T) => void,
+    onError: (error: RBAuthErrors) => void
+  ) => {
+    console.log('inside apiWrap');
+    return new ApiAccessBuilder(logic)
+      .withSuccess(onSuccess)
+      .withFailure(onError)
+      .withAccessTokenError(this.accessTokenError)
+      .withRefreshTokenError(this.refreshTokenError)
+      .build(this.refresh as any);
+  };
+
+  private wrap = async <T>(logic: () => T, flag = true) => {
     if (flag) this.setReloading(true);
     try {
-      return logic();
-    } catch (err) {
-      throw err;
+      return await logic();
+    } catch (e) {
+      console.log('wrap catch: ', e.message);
+      if (e.message === 'Failed to fetch') this.errorCallback(RBAuthErrors.FAILLED_TO_FETCH, e);
+      // others
+      else if (e.message === RBAuthErrors.UNAUTHORIZED) this.errorCallback(e);
+      else if (e.message === RBAuthErrors.REFRESH_TOKEN_NOT_PRESENT) {
+        // swallow silently
+      }
+      // all others
+      else if (e.message !== RBAuthErrors.REFRESH_TOKEN_NOT_PRESENT)
+        this.errorCallback(RBAuthErrors.UNKNOWN, e);
+      throw e;
     } finally {
       if (flag) this.setReloading(false);
     }
+    // try {
+    //   return logic();
+    // } catch (error) {
+    //   if (error.message === AuthErrors.REFRESH_TOKEN_NOT_PRESENT) {
+    //     // swallow
+    //   }
+    //   //  else if (error.message === AuthErrors.REFRESH_TOKEN_REVOKED) {
+    //   //   this.errorCallback(AuthErrors.REFRESH_TOKEN_REVOKED);
+    //   // } else if (
+    //   //   error.mesage === AuthErrors.UNAUTHORIZED ||
+    //   //   error.mesage === 'JSON Parse error: Unexpected identifier "Unauthorized"'
+    //   // ) {
+    //   //   this.errorCallback(AuthErrors.UNAUTHORIZED);
+    //   // } else if (error.message === AuthErrors.TOO_MANY_REQUESTS) {
+    //   //   this.errorCallback(AuthErrors.TOO_MANY_REQUESTS);
+    //   // }
+    //   console.log('wrap catch: ', error, error.message);
+    //   // throw error;
+    //   return null;
+    // } finally {
+    //   if (flag) this.setReloading(false);
+    // }
   };
 
   private authenticate = async (

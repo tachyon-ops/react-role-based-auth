@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type React from 'react';
 
 // components
@@ -12,6 +13,21 @@ import { AuthContext, RBAuthInitialToken } from './roles-based-auth/context';
 import { TokenUtil } from './authServices/TokenUtilities';
 import { RequestBuilder, HTTPMethod } from './authServices/RequestBuilder';
 import { ApiAccessBuilder } from './authServices/RequestWrapper';
+import { BaseAuthApiWrapper } from './authServices/BaseAuthApiWrapper';
+import { Can } from './components/Can';
+
+/**
+ * RefreshToken Errors
+ */
+export enum RBAuthErrors {
+  INVALID_GRANT = 'invalid_grant',
+  REFRESH_TOKEN_REVOKED = 'refreshTokenRevoked',
+  REFRESH_TOKEN_NOT_PRESENT = 'noRefreshToken',
+  UNAUTHORIZED = 'Unauthorized',
+  TOO_MANY_REQUESTS = 'Too Many Requests',
+  FAILLED_TO_FETCH = 'failled to fetch',
+  UNKNOWN = 'UNKNOWN',
+}
 
 /**
  * SecureRoute Types
@@ -62,7 +78,8 @@ export type RBAuthContextType<
   SignUpType = UnknownAuthProcess,
   SilentAuthType = UnknownAuthProcess,
   HandleAuthType = UnknownAuthProcess,
-  RefreshTokens = UnknownRefreshProcess
+  RefreshTokens = UnknownRefreshProcess,
+  TApis = Record<string, unknown>
 > = {
   isAuth: boolean; // to check if authenticated or not
   reloading: boolean;
@@ -74,6 +91,7 @@ export type RBAuthContextType<
     handle: HandleAuthType; // handle Auth0 login process
     logout: LogOutType; // logout the user
     refresh: RefreshTokens;
+    apis: TApis;
   };
   routes: {
     public: string;
@@ -88,22 +106,26 @@ export type RBAuthContextType<
 export type RBAuthReactContext<
   TUser extends RBAuthUserModelWithRole<string>,
   TRules extends RBAuthRulesInterface<string>,
-  // AuthApi extends AuthApiInterface
   LoginType extends UnknownAuthProcess = UnknownAuthProcess,
   LogOutType extends UnknownAuthProcess = UnknownAuthProcess,
   SignUpType extends UnknownAuthProcess = UnknownAuthProcess,
   HandleAuthType extends UnknownAuthProcess = UnknownAuthProcess,
-  SilentAuthType extends UnknownAuthProcess = UnknownAuthProcess
+  SilentAuthType extends UnknownAuthProcess = UnknownAuthProcess,
+  RefreshTokensType extends UnknownAuthProcess = UnknownAuthProcess,
+  // AppApis
+  TApi extends Record<string, unknown> = Record<string, unknown>
 > = React.Context<
   RBAuthContextType<
     TUser,
     TRules,
-    // AuthApi
     LoginType,
     LogOutType,
     SignUpType,
+    SilentAuthType,
     HandleAuthType,
-    SilentAuthType
+    RefreshTokensType,
+    // AppApis
+    TApi
   >
 >;
 
@@ -165,10 +187,12 @@ export {
   RefreshApp,
   SecureScreen,
   AuthCallback,
+  Can,
   TokenUtil,
   HeadersBuilder,
   RequestBuilder,
   HTTPMethod,
   ApiAccessBuilder,
   RBAuthInitialToken,
+  BaseAuthApiWrapper,
 };

@@ -1,16 +1,15 @@
-import { AsyncStorage } from 'react-native';
 import { RBAuthStorageType, TokenUtil, RBAuthTokensType } from 'react-rb-auth';
 
 const TOKENS_KEY = 'react_rb_auth_tokens';
 
 export class AppStorage implements RBAuthStorageType {
   tokensKey: string;
-  accessToken: string = '';
-  refreshToken: string = '';
-  openIdToken: string = '';
-  tokenType: string = '';
-  expiresIn: string = '';
-  scope: string = '';
+  accessToken = '';
+  refreshToken = '';
+  openIdToken = '';
+  tokenType = '';
+  expiresIn = '';
+  scope = '';
 
   constructor(setInitiated: (flag: boolean) => void, tokensKey: string = TOKENS_KEY) {
     this.tokensKey = tokensKey;
@@ -22,10 +21,10 @@ export class AppStorage implements RBAuthStorageType {
   }
 
   private async loadTokensFromStorage() {
-    const rawTokens = await AsyncStorage.getItem(this.tokensKey);
+    const rawTokens = localStorage.getItem(this.tokensKey);
     if (rawTokens && rawTokens.length > 0) {
       const tokens: RBAuthTokensType = JSON.parse(rawTokens);
-      console.log('AppStorage::loadTokensFromStorage tokens => ', tokens.expiresIn);
+      console.log('AppStorage::loadTokensFromStorage tokens => ', tokens.refreshToken);
       // we only save refresh token :)
       this.refreshToken = tokens.refreshToken;
       this.accessToken = tokens.accessToken;
@@ -51,15 +50,15 @@ export class AppStorage implements RBAuthStorageType {
       const valueToSave = {
         refreshToken: tokens.refreshToken,
       };
-      await this.setItem(this.tokensKey, valueToSave);
+      this.setItem(this.tokensKey, valueToSave);
     } catch (e) {
       console.log('error while saving to your storage: ', e);
     }
   }
 
-  setItem = async (key: string, value: Object = {}) => {
+  setItem = async (key: string, value: Record<string, string> = {}) => {
     console.log('setting item: ', key, value);
-    if (key && value) return await AsyncStorage.setItem(key, JSON.stringify(value));
+    if (key && value) return localStorage.setItem(key, JSON.stringify(value));
     else return;
   };
 }

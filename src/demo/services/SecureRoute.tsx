@@ -13,5 +13,8 @@ export const SecureRoute: React.FC<{
   Allowed: React.FC;
   NotAllowed?: React.FC;
 }> = ({ path, Allowed, NotAllowed }) => (
-  <Route to={path} render={() => <SecureScreen Allowed={Allowed} Redirect={AppRedirect} NotAllowed={NotAllowed} />} />
+  <Route
+    to={path}
+    render={() => <SecureScreen Allowed={Allowed} Redirect={AppRedirect} NotAllowed={NotAllowed} />}
+  />
 );

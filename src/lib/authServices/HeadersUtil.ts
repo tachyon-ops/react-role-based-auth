@@ -1,3 +1,5 @@
+import { TokenUtil } from './TokenUtilities';
+
 export class HeadersBuilder {
   headers = new Headers();
   constructor() {
@@ -16,6 +18,14 @@ export class HeadersBuilder {
 
   withToken(type: string | 'Bearer', token: string) {
     this.headers.append('Authorization', `${type} ${token}`);
+    return this;
+  }
+
+  withRBAuthToken() {
+    this.headers.append(
+      'Authorization',
+      `${TokenUtil.getTokens().tokenType} ${TokenUtil.getTokens().accessToken}`
+    );
     return this;
   }
 

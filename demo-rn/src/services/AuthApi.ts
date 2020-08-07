@@ -19,31 +19,26 @@ export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
   password: string
 ) => Promise<AuthResObj<U>>;
 export type SilentType = () => Promise<AuthResObj>;
-export type HandleType = () => Promise<unknown>;
+export type HandleType = () => Promise<AuthResObj>;
 export type LogoutType = (email: string, password: string) => Promise<unknown>;
 export type SignupType = (name: string, email: string, password: string) => Promise<unknown>;
-export type RefreshType = () => Promise<RBAuthTokensType>;
+export type RefreshType = <T>() => Promise<T>;
 
 // TODO: test handle (web based only)
 export class AuthApi implements PartialAuthApi {
   static login: LoginType = async (username: string, password: string) =>
     AuthApi.authWrapper(Auth0Api.mapTokens(await Auth0Api.authorize(username, password)));
-
-  static silent: SilentType = async () =>
-    AuthApi.authWrapper(
-      Auth0Api.mapTokens(await Auth0Api.refresh(TokenUtil.getTokens().refreshToken))
-    );
-
-  // https://auth0.com/docs/logout
-  static logout = () => {
-    Auth0Api.revoke(TokenUtil.getTokens());
-    return Auth0Api.logout();
-  };
-
+  static silent: SilentType = async () => AuthApi.authWrapper(await AuthApi.refresh())
+  // {
+  //   try {
+  //     return await AuthApi.authWrapper(await AuthApi.refresh());
+  //   } catch (error) {
+  //     console.log('error', error.message);
+  //   }
+  // };
+  static logout = () => Auth0Api.logout();
   static signup: SignupType = (name, email, password) => Auth0Api.signup(name, email, password);
-
-  static refresh: RefreshType = async () =>
-    Auth0Api.mapTokens(await Auth0Api.refresh(TokenUtil.getTokens().refreshToken));
+  static refresh = () => Auth0Api.refresh();
 
   /**
    * Helpers

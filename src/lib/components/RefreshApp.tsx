@@ -2,6 +2,10 @@ import React, { useContext, useState, useEffect } from 'react';
 
 import { AuthContext } from '..';
 
+class FirstRun {
+  public static done = false;
+}
+
 export const RefreshApp: React.FC<{
   locationPathName: string;
   AuthReloadingComp: React.FC;
@@ -9,30 +13,28 @@ export const RefreshApp: React.FC<{
   authCallbackRoute?: string;
 }> = (props) => {
   const auth = useContext(AuthContext);
-  const [firstAuthCheck, setFirstAuthCheck] = useState(true);
   const [isReloading, setIsReloading] = useState(true);
 
   useEffect(() => {
     if (auth.reloading && props.AuthLoadingComp !== undefined) setIsReloading(true);
     else setIsReloading(false);
-  }, [firstAuthCheck, auth.reloading, props.AuthLoadingComp]);
+  }, [auth.reloading, props.AuthLoadingComp]);
 
   const silentSwallow = () => null;
 
   useEffect(() => {
-    if (firstAuthCheck && props.locationPathName !== props.authCallbackRoute)
-      auth.logic
-        .silent()
-        .then(silentSwallow)
-        .catch(silentSwallow)
-        .finally(() => setFirstAuthCheck(false));
+    if (!FirstRun.done && props.locationPathName !== props.authCallbackRoute) {
+      FirstRun.done = true;
+      console.log('will issue silent auth');
+      auth.logic.silent().then(silentSwallow).catch(silentSwallow);
+    }
   }, []);
 
-  if (firstAuthCheck) return <props.AuthReloadingComp />;
+  if (!FirstRun.done && props.AuthReloadingComp) return <props.AuthReloadingComp />;
   else
     return (
       <>
-        {isReloading && <props.AuthLoadingComp />}
+        {isReloading && props.AuthLoadingComp && <props.AuthLoadingComp />}
         {props.children}
       </>
     );

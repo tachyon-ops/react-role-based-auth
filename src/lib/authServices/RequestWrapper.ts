@@ -1,39 +1,51 @@
-// 401 is the code spit by Auth0 when a token get's expired
-const UNAUTHORIZED_CODE = 401;
+import { RBAuthErrors } from '../index';
+
 const RECUR_LEVEL = 1;
 
-type RefreshType = (reloadFlag?: boolean) => Promise<unknown>;
-type RequestType = () => Promise<Response>;
+type RefreshType = (reloadFlag?: boolean) => Promise<Response>;
+type RequestType = <T>() => Promise<T>;
 
 type OnSuccessType = <T>(arg: T) => void;
-type OnFailureType = (error: string) => void;
+type OnFailureType = (error: RBAuthErrors) => void;
 
 class RequestWrapper {
-  private static recursion = async <T>(
+  private static recursion = async (
     refresh: RefreshType,
     req: RequestType,
-    success: OnSuccessType,
-    failure: OnFailureType,
-    unauthorizedCode = UNAUTHORIZED_CODE,
-    recursion = RECUR_LEVEL
+    onSuccess: OnSuccessType,
+    onFailure: OnFailureType,
+    recursion = RECUR_LEVEL,
+    accessTokenError = RBAuthErrors.UNAUTHORIZED,
+    refresTokenError = RBAuthErrors.INVALID_GRANT
   ): Promise<void> => {
-    const res = await req();
-    if (res.status === UNAUTHORIZED_CODE && recursion >= 1) {
-      // refresh
-      await refresh();
-      // then
-      return RequestWrapper.recursion<T>(
-        refresh,
-        req,
-        success,
-        failure,
-        unauthorizedCode,
-        recursion - 1
-      );
-    } else {
-      // last recursion
-      if (res.ok) success<T>(await res.json());
-      else failure(await res.text());
+    console.log('RequestWrapper::recursion');
+    try {
+      console.log('RequestWrapper::recursion will request');
+      await req();
+      console.log('RequestWrapper::recursion has request');
+    } catch (e) {
+      if (e.message === accessTokenError && recursion >= 1) {
+        try {
+          // refresh
+          await refresh();
+          // then
+          return RequestWrapper.recursion(
+            refresh,
+            req,
+            onSuccess,
+            onFailure,
+            recursion - 1,
+            accessTokenError,
+            refresTokenError
+          );
+        } catch (error) {
+          onFailure(RBAuthErrors.REFRESH_TOKEN_REVOKED);
+          throw new Error(RBAuthErrors.REFRESH_TOKEN_REVOKED);
+        }
+      } else {
+        onFailure(e);
+      }
+      throw e;
     }
   };
 
@@ -48,21 +60,23 @@ class RequestWrapper {
     request: RequestType,
     onSuccess: OnSuccessType,
     onFailure: OnFailureType,
-    unauthorizedCode = UNAUTHORIZED_CODE,
-    recursion = RECUR_LEVEL
+    recursion = RECUR_LEVEL,
+    accessTokenError = RBAuthErrors.UNAUTHORIZED,
+    refresTokenError = RBAuthErrors.INVALID_GRANT
   ) {
     /**
      * onPress logic
      * @param refresh Logic for refreshing tokens
      */
-    return (refreshLogic: RefreshType) => () =>
+    return (refreshLogic: RefreshType) => async () =>
       RequestWrapper.recursion(
         refreshLogic,
         request,
         onSuccess,
         onFailure,
-        unauthorizedCode,
-        recursion
+        recursion,
+        accessTokenError,
+        refresTokenError
       );
   }
 }
@@ -70,10 +84,21 @@ class RequestWrapper {
 export class ApiAccessBuilder {
   private success: OnSuccessType;
   private failure: OnFailureType;
-  private unauthorizedCode: number;
   private recursions: number;
+  private accessTokenError: RBAuthErrors;
+  private refreshTokenError: RBAuthErrors;
 
-  constructor(private logic: RequestType) {}
+  constructor(private logic: <T>() => Promise<T>) {}
+
+  withAccessTokenError(accessTokenError: RBAuthErrors) {
+    this.accessTokenError = accessTokenError;
+    return this;
+  }
+
+  withRefreshTokenError(refreshTokenError: RBAuthErrors) {
+    this.refreshTokenError = refreshTokenError;
+    return this;
+  }
 
   withSuccess(success: OnSuccessType) {
     this.success = success;
@@ -82,11 +107,6 @@ export class ApiAccessBuilder {
 
   withFailure(failure: OnFailureType) {
     this.failure = failure;
-    return this;
-  }
-
-  withUnauthorizedCode(unauthorizedCode: number) {
-    this.unauthorizedCode = unauthorizedCode;
     return this;
   }
 
@@ -100,8 +120,9 @@ export class ApiAccessBuilder {
       this.logic,
       this.success,
       this.failure,
-      this.unauthorizedCode,
-      this.recursions
+      this.recursions,
+      this.accessTokenError,
+      this.refreshTokenError
     )(refresh);
   }
 }

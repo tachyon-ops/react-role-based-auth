@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { RBAuthUserModelWithRole, RBAuthBaseRoles, RBAuthContextType } from '..';
 import { BaseAuthApiWrapper } from '../authServices/BaseAuthApiWrapper';
 import { AuthContext, RBAuthInitialUser } from '../roles-based-auth/context';
-import { PartialAuthApi } from '../index';
+import { PartialAuthApi, RBAuthErrors } from '../index';
 
 export const Auth: React.FC<{
-  api: PartialAuthApi;
+  authApi: PartialAuthApi;
   routes?: { private: string; public: string };
-}> = ({ children, api, routes }) => {
-  // const [auth, setAuth] = React.useState(false);
+  onAuthExpired?: (e: RBAuthErrors) => void;
+  appApis?: Record<string, unknown>;
+}> = ({ children, authApi, routes, onAuthExpired, appApis = {} }) => {
   const [reloading, setReloading] = React.useState(true);
   const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles>>(null);
 
-  const logic = new BaseAuthApiWrapper(setReloading, setUser, api);
+  const logic = new BaseAuthApiWrapper(setReloading, setUser, authApi, onAuthExpired, appApis);
+
+  useEffect(() => {
+    console.log('user changed: ', user);
+  }, [user]);
 
   const contextVal: RBAuthContextType = {
-    isAuth: !!user,
+    isAuth: user && user.role && user.role !== 'public',
     reloading,
     logic,
     routes,

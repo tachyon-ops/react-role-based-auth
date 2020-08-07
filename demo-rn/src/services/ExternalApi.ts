@@ -1,8 +1,8 @@
 import { AUTH0_DOMAIN } from '@env';
 import { TokenUtil, RequestBuilder, HeadersBuilder, HTTPMethod } from 'react-rb-auth';
 
-export class AppApi {
-  static getUserCheckAccessToken = (): Promise<Response> => {
+class ExternalApi {
+  getUser = (): Promise<Response> => {
     const { tokenType, accessToken } = TokenUtil.getTokens();
     return new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
       .withMethod(HTTPMethod.GET)
@@ -10,3 +10,7 @@ export class AppApi {
       .build();
   };
 }
+
+export const GlobalAppApi = {
+  external: new ExternalApi(),
+};

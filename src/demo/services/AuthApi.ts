@@ -1,33 +1,74 @@
-import { PartialAuthApi } from 'react-rb-auth';
+import {
+  PartialAuthApi,
+  RBAuthTokensType,
+  RBAuthUserModelWithRole,
+  RBAuthBaseRoles,
+} from 'react-rb-auth';
 
-import { UserModel } from '../models/user';
+import { anonUser } from '../models/user';
+import { Auth0Api } from './Auth0Api';
+import { AppRole } from '../models/role';
 
-export type LoginType = (user: UserModel) => Promise<UserModel>;
-export type SignupType = () => Promise<unknown>;
-export type HandleType = () => Promise<unknown>;
-export type SilentType = (user: UserModel) => Promise<UserModel>;
+type AuthResObj<U = RBAuthUserModelWithRole<RBAuthBaseRoles>> = {
+  tokens: RBAuthTokensType;
+  user: U;
+};
+type UserInfoApiType = {
+  user_metadata: {
+    role: AppRole;
+  };
+};
+type UserApiType<U> = {
+  nickname: string;
+  sub: string;
+} & U;
 
-const TEST_TIMEOUT = 1000;
+export type LoginType = <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
+  email: string,
+  password: string
+) => Promise<AuthResObj<U>>;
+export type SilentType = () => Promise<AuthResObj>;
+export type HandleType = () => Promise<AuthResObj>;
+export type LogoutType = () => Promise<unknown>;
+export type SignupType = (name: string, email: string, password: string) => Promise<unknown>;
+export type RefreshType = <T>() => Promise<T>;
 
+// TODO: test handle (web based only)
 export class AuthApi implements PartialAuthApi {
-  static login: LoginType = (user) =>
-    new Promise((resolve, reject) => {
-      console.log('AuthApi.login: args: ', user);
-      if (user) {
-        console.log('will resolve');
-        setTimeout(() => {
-          resolve(user);
-        }, TEST_TIMEOUT);
-      } else {
-        console.log('will reject');
-        reject('credentials not right');
-      }
-    });
+  static login: LoginType = async (username: string, password: string) =>
+    AuthApi.authWrapper(Auth0Api.mapTokens(await Auth0Api.authorize(username, password)));
 
-  static logout = () => new Promise((a) => setTimeout(() => a(), TEST_TIMEOUT));
-  static signup = () =>
-    new Promise((_a, r) => setTimeout(() => r(), TEST_TIMEOUT));
-  static handle = () =>
-    new Promise((_a, r) => setTimeout(() => r(), TEST_TIMEOUT));
-  static silent = () => new Promise((a) => setTimeout(() => a(), TEST_TIMEOUT));
+  static silent: SilentType = async () => AuthApi.authWrapper(await AuthApi.refresh());
+  static logout = () => Auth0Api.logout();
+  static signup: SignupType = (name, email, password) => Auth0Api.signup(name, email, password);
+  static refresh = () => Auth0Api.refresh();
+
+  /**
+   * Helpers
+   */
+  private static authWrapper = async <U extends RBAuthUserModelWithRole<RBAuthBaseRoles>>(
+    t: RBAuthTokensType
+  ): Promise<{
+    user: U;
+    tokens: RBAuthTokensType;
+  }> => {
+    const user = (await Auth0Api.getUser(t.tokenType, t.accessToken)) as UserApiType<U>;
+    // get role
+    const userInfo = (await Auth0Api.getUserInfo(
+      t.tokenType,
+      t.accessToken,
+      user.sub
+    )) as UserInfoApiType;
+    // TODO: if needed, we can all stuff to the user console.log('userInfo: ', userInfo);
+    let role = anonUser.role;
+    if (userInfo && userInfo.user_metadata && userInfo.user_metadata.role)
+      role = userInfo.user_metadata.role;
+    return {
+      tokens: t,
+      user: {
+        ...(user || anonUser),
+        role,
+      } as U,
+    };
+  };
 }

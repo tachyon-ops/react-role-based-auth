@@ -6,17 +6,19 @@ export enum HTTPMethod {
   DELETE = 'DELETE',
 }
 
+type ModeType = 'no-cors';
 export class RequestBuilder {
   private route: string;
-  private body: object;
+  private body: Record<string, unknown>;
   private headers: Headers;
   private method: HTTPMethod = HTTPMethod.GET;
+  private mode: ModeType;
 
   constructor(route: string, private debug = false) {
     this.route = route;
     return this;
   }
-  withAuth0Body(body: object = {}) {
+  withAuth0Body(body: Record<string, unknown> = {}) {
     this.body = body;
     return this;
   }
@@ -32,19 +34,27 @@ export class RequestBuilder {
     this.method = method;
     return this;
   }
+  withMode(mode: ModeType) {
+    this.mode = mode;
+    return this;
+  }
   private request() {
-    if (this.debug)
+    if (this.debug) {
+      const debugHeaders = {};
+      this.headers.forEach((value, key) => (debugHeaders[key] = value));
       console.log(
         'will request: ',
         this.route,
         this.method,
-        this.headers,
+        JSON.stringify(debugHeaders),
         JSON.stringify(this.body)
       );
+    }
     return fetch(this.route, {
       method: this.method,
       headers: this.headers,
       body: JSON.stringify(this.body),
+      mode: this.mode,
     });
   }
   async build(): Promise<Response> {
@@ -55,5 +65,11 @@ export class RequestBuilder {
   }
   async buildText(): Promise<string> {
     return this.request().then((res) => res.text());
+  }
+  async buildDynamic<T>(): Promise<T> {
+    const res = await this.request();
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.indexOf('application/json') !== -1) return res.json();
+    else throw Error(await res.text());
   }
 }

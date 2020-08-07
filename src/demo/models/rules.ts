@@ -1,10 +1,10 @@
 import { RBAuthRulesInterface } from 'react-rb-auth';
 
-import { AppRoles } from './role';
+import { AppRole } from './role';
 
 type IndexableUser = { id: string };
 
-export const rules: RBAuthRulesInterface<AppRoles> = {
+export const rules: RBAuthRulesInterface<AppRole> = {
   public: {
     static: [
       // visitor permissions
@@ -13,7 +13,7 @@ export const rules: RBAuthRulesInterface<AppRoles> = {
       'posts:list',
     ],
   },
-  editor: {
+  writer: {
     static: [
       // writer permissions
       // routes
@@ -25,13 +25,7 @@ export const rules: RBAuthRulesInterface<AppRoles> = {
       'posts:create',
     ],
     dynamic: {
-      'posts:edit': ({
-        userId,
-        postOwnerId,
-      }: {
-        userId: string;
-        postOwnerId: string;
-      }): boolean => {
+      'posts:edit': ({ userId, postOwnerId }: { userId: string; postOwnerId: string }): boolean => {
         if (!userId || !postOwnerId) return false;
         return userId === postOwnerId;
       },
@@ -53,13 +47,7 @@ export const rules: RBAuthRulesInterface<AppRoles> = {
       'posts:delete',
     ],
     dynamic: {
-      'users:delete': ({
-        authUser,
-        user,
-      }: {
-        authUser: IndexableUser;
-        user: IndexableUser;
-      }): boolean => {
+      'users:delete': ({ authUser, user }: { authUser: IndexableUser; user: IndexableUser }): boolean => {
         if (authUser.id === user.id) return false;
         return true;
       },

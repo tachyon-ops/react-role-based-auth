@@ -1,22 +1,18 @@
 {
+  "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
   "extends": [
     "react-app",
     "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "eslint-config-prettier"
   ],
+  "plugins": ["@typescript-eslint", "eslint-plugin-prettier"],
   "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "quoteProps": "consistent",
-        "singleQuote": true,
-        "tabWidth": 2,
-        "trailingComma": "es5",
-        "useTabs": false
-      }
-    ]
+    "no-console": 1, // Means warning
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "prettier/prettier": 2 // Means error
   }
 }

@@ -9,7 +9,7 @@ const initialStorage: RBAuthStorageType = {
   tokenType: null,
   expiresIn: null,
   scope: null,
-  setTokens: () => {},
+  setTokens: () => null,
 };
 
 export class TokenUtil {
