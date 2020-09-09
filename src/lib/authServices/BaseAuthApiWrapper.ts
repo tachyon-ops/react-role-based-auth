@@ -43,6 +43,8 @@ abstract class UserReloader {
 
 type RefreshTokenEndLifeCallbackType = (rbAuthErros: RBAuthErrors, error?: Error) => void;
 
+const dummyFunction = () => new Promise((r) => r());
+
 export class BaseAuthApiWrapper<
   LoginType extends KnownAuthProcess<{
     tokens: RBAuthTokensType;
@@ -61,12 +63,19 @@ export class BaseAuthApiWrapper<
   RefreshType extends KnownAuthProcess<RBAuthTokensType>,
   AppApis extends Record<string, unknown>
 > extends UserReloader implements AuthApiInterface {
-  private loginLogic: LoginType;
-  private logoutLogic: LogOutType;
-  private signupLogic: SignUpType;
-  private silentLogic: SilentType;
-  private handleLogic: HandleType;
-  private refreshLogic: RefreshType;
+  defaultLogin: LoginType = dummyFunction as LoginType;
+  defaultLogout: LogOutType = dummyFunction as LogOutType;
+  defaultSignupLogic: SignUpType = dummyFunction as SignUpType;
+  defaultSilentLogic: SilentType = dummyFunction as SilentType;
+  defaultHandleLogic: HandleType = dummyFunction as HandleType;
+  defaultRefreshLogic: RefreshType = dummyFunction as RefreshType;
+
+  private loginLogic: LoginType = this.defaultLogin;
+  private logoutLogic: LogOutType = this.defaultLogout;
+  private signupLogic: SignUpType = this.defaultSignupLogic;
+  private silentLogic: SilentType = this.defaultSilentLogic;
+  private handleLogic: HandleType = this.defaultHandleLogic;
+  private refreshLogic: RefreshType = this.defaultRefreshLogic;
   private errorCallback: RefreshTokenEndLifeCallbackType = () => null;
   private appApis: Record<string, unknown> = {};
 
@@ -118,7 +127,7 @@ export class BaseAuthApiWrapper<
    * private Helpers
    */
   private embedWrapperLogicIntoApis(apis: AppApis) {
-    const result = {};
+    const result: Record<string, unknown> = {};
     Object.keys(apis).forEach((item) => {
       if (item.startsWith('logic') && apis[item] && isFunction(apis[item]))
         result[item] = this.apiWrap(apis[item] as <T>() => Promise<T>);
@@ -214,7 +223,7 @@ export class BaseAuthApiWrapper<
     res: {
       tokens: RBAuthTokensType;
       user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-    } = null
+    } | null = null
   ) => {
     if (res && res.user && res.tokens) {
       this.setUser(res.user);

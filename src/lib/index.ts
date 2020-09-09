@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type React from 'react';
+import React from 'react';
 
 // components
 import { Auth } from './components/Auth';
@@ -154,8 +154,8 @@ export type PartialAuthApi = Partial<AuthApiInterface>;
 
 export type RBAuthTokensType = {
   accessToken: string;
-  refreshToken?: string;
-  openIdToken?: string;
+  refreshToken: string;
+  openIdToken: string;
   expiresIn: string;
   scope: string;
   tokenType: string;

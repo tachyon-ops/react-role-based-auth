@@ -1,8 +1,6 @@
 import React, { ReactElement } from 'react';
 
-import type { RBAuthBaseRoles, RBAuthRulesInterface } from '..';
-
-import { AuthContext } from '../roles-based-auth/context';
+import { RBAuthBaseRoles, RBAuthRulesInterface, AuthContext } from '..';
 
 /**
  * Types

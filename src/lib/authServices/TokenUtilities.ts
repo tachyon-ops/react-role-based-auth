@@ -3,12 +3,12 @@ import { RBAuthTokensType, RBAuthStorageType } from '..';
 import { RBAuthInitialToken } from '../roles-based-auth/context';
 
 const initialStorage: RBAuthStorageType = {
-  accessToken: null,
-  refreshToken: null,
-  openIdToken: null,
-  tokenType: null,
-  expiresIn: null,
-  scope: null,
+  accessToken: '',
+  refreshToken: '',
+  openIdToken: '',
+  tokenType: '',
+  expiresIn: '',
+  scope: '',
   setTokens: () => null,
 };
 

@@ -82,11 +82,11 @@ class RequestWrapper {
 }
 
 export class ApiAccessBuilder {
-  private success: OnSuccessType;
-  private failure: OnFailureType;
-  private recursions: number;
-  private accessTokenError: RBAuthErrors;
-  private refreshTokenError: RBAuthErrors;
+  private success: OnSuccessType = () => null;
+  private failure: OnFailureType = () => null;
+  private recursions: number = RECUR_LEVEL;
+  private accessTokenError: RBAuthErrors = RBAuthErrors.INVALID_GRANT;
+  private refreshTokenError: RBAuthErrors = RBAuthErrors.REFRESH_TOKEN_REVOKED;
 
   constructor(private logic: <T>() => Promise<T>) {}
 

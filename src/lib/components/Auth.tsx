@@ -12,7 +12,7 @@ export const Auth: React.FC<{
   appApis?: Record<string, unknown>;
 }> = ({ children, authApi, routes, onAuthExpired, appApis = {} }) => {
   const [reloading, setReloading] = React.useState(true);
-  const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles>>(null);
+  const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles> | null>(null);
 
   const logic = new BaseAuthApiWrapper(setReloading, setUser, authApi, onAuthExpired, appApis);
 
@@ -21,10 +21,10 @@ export const Auth: React.FC<{
   }, [user]);
 
   const contextVal: RBAuthContextType = {
-    isAuth: user && user.role && user.role !== 'public',
+    isAuth: !!(user && user.role && user.role !== 'public'),
     reloading,
     logic,
-    routes,
+    routes: { private: routes?.private || '/private', public: routes?.public || '/' },
     user: user || RBAuthInitialUser,
     rules: {
       admin: {},

@@ -8,11 +8,11 @@ export enum HTTPMethod {
 
 type ModeType = 'no-cors';
 export class RequestBuilder {
-  private route: string;
-  private body: Record<string, unknown>;
-  private headers: Headers;
+  private route = '';
+  private body: Record<string, unknown> = {};
+  private headers: Headers = new Headers();
   private method: HTTPMethod = HTTPMethod.GET;
-  private mode: ModeType;
+  private mode: ModeType = 'no-cors';
 
   constructor(route: string, private debug = false) {
     this.route = route;
@@ -22,7 +22,7 @@ export class RequestBuilder {
     this.body = body;
     return this;
   }
-  withBody(body) {
+  withBody(body: Record<string, unknown> = {}) {
     this.body = body;
     return this;
   }
@@ -40,7 +40,7 @@ export class RequestBuilder {
   }
   private request() {
     if (this.debug) {
-      const debugHeaders = {};
+      const debugHeaders: Record<string, string> = {};
       this.headers.forEach((value, key) => (debugHeaders[key] = value));
       console.log(
         'will request: ',
