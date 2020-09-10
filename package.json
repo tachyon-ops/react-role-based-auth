@@ -170,6 +170,7 @@
     ]
   },
   "peerDependencies": {
-    "react": "*"
+    "react": "*",
+    "util": "*"
   }
 }

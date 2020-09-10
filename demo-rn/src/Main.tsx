@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Navigation } from './navigation';
+import { Alert } from 'react-native';
 import { Auth, RefreshApp, TokenUtil } from 'react-rb-auth';
 import 'react-native-gesture-handler';
 
 import { AuthApi } from './services/AuthApi';
 import { AuthReloading, AuthLoading } from './components/AuthReloading';
+import { AppStorage } from './services/AppLocalStorage';
+import { GlobalAppApi } from './services/ExternalApi';
 import { AssetsLoader } from './services/AssetsLoader';
 import { StyleContext, StyleContextValue } from './services/StyleService';
-import { AppStorage } from './services/AppLocalStorage';
-import { Alert } from 'react-native';
-import { GlobalAppApi } from './services/ExternalApi';
+import { Navigation } from './navigation';
 
 export const Main: React.FC = () => {
   const [initiated, setInitiated] = useState(false);

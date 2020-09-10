@@ -4,12 +4,15 @@ export enum HTTPMethod {
   PATCH = 'PATCH',
   PUT = 'PUT',
   DELETE = 'DELETE',
+  HEAD = 'HEAD',
+  CONNECT = 'CONNECT',
+  TRACE = 'TRACE',
 }
 
 type ModeType = 'no-cors';
 export class RequestBuilder {
   private route = '';
-  private body: Record<string, unknown> = {};
+  private body: Record<string, unknown> | null = null;
   private headers: Headers = new Headers();
   private method: HTTPMethod = HTTPMethod.GET;
   private mode: ModeType = 'no-cors';
@@ -50,12 +53,15 @@ export class RequestBuilder {
         JSON.stringify(this.body)
       );
     }
-    return fetch(this.route, {
+
+    const opts = {
       method: this.method,
       headers: this.headers,
-      body: JSON.stringify(this.body),
       mode: this.mode,
-    });
+    };
+    if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body)
+      opts['body'] = JSON.stringify(this.body);
+    return fetch(this.route, opts);
   }
   async build(): Promise<Response> {
     return this.request();
