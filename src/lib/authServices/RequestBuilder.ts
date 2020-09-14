@@ -17,9 +17,9 @@ export class RequestBuilder {
   private body: Record<string, unknown> | null = null;
   private headers: Headers = new Headers();
   private method: HTTPMethod = HTTPMethod.GET;
-  private mode: ModeType;
+  private mode: ModeType | null = null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private errorHandling: ErrorHandlerType<any>;
+  private errorHandling: ErrorHandlerType<any> | null = null;
 
   constructor(route: string, private debug = false) {
     this.route = route;
@@ -62,11 +62,11 @@ export class RequestBuilder {
       );
     }
 
-    const opts: { method: HTTPMethod; headers: Headers; mode: ModeType; body?: string } = {
+    const opts: { method: HTTPMethod; headers: Headers; mode?: ModeType; body?: string } = {
       method: this.method,
       headers: this.headers,
-      mode: this.mode,
     };
+    if (this.mode) opts.mode = this.mode;
     if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body)
       opts['body'] = JSON.stringify(this.body);
     return fetch(this.route, opts);
