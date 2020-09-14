@@ -58,7 +58,7 @@ export class AppStorage implements RBAuthStorageType {
   }
 
   setItem = async (key: string, value: Object = {}) => {
-    console.log('setting item: ', key, value);
+    // console.log('setting item: ', key, value);
     if (key && value) return await AsyncStorage.setItem(key, JSON.stringify(value));
     else return;
   };

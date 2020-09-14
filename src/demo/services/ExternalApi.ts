@@ -7,7 +7,7 @@ class ExternalApi {
     new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
       .withMethod(HTTPMethod.GET)
       .withHeaders(new HeadersBuilder().withRBAuthToken().build())
-      .buildDynamic();
+      .build();
 }
 
 export const GlobalAppApi = {

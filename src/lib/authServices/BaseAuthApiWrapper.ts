@@ -147,7 +147,7 @@ export class BaseAuthApiWrapper<
   }> =>
     this.wrap(async () => {
       const res = await logic(...args);
-      console.log('res', res);
+      // console.log('res', res);
       await this.authenticate(res);
       return res;
     });

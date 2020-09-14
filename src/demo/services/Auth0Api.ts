@@ -11,6 +11,11 @@ const AUTH0_DOMAIN = process.env.REACT_APP_AUTH0_DOMAIN;
 const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID;
 const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE;
 
+interface AuthError {
+  error: string;
+  error_description: string;
+}
+
 type RawTokensType = {
   access_token: string;
   refresh_token: string;
@@ -51,13 +56,11 @@ export class Auth0Api {
         username,
         password,
       })
-      .buildJson();
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) throw Error(res.error);
+      })
+      .build();
 
-  private static mapJSONorTEXT = async <T>(res: Response): Promise<T> => {
-    const contentType = res.headers.get('content-type');
-    if (contentType && contentType.indexOf('application/json') !== -1) return await res.json();
-    else throw new Error(await res.text());
-  };
   // api docs: https://auth0.com/docs/api/authentication#revoke-refresh-token
   static refresh = async (
     refreshToken: string = TokenUtil.getTokens().refreshToken
@@ -71,20 +74,21 @@ export class Auth0Api {
         client_id: AUTH0_CLIENT_ID,
         refresh_token: refreshToken,
       })
-      .build();
-    const result: RawTokensType & {
-      error: string;
-      error_description: string;
-    } = await Auth0Api.mapJSONorTEXT(res);
-    if (result.error) console.log('Auth0Api::refresh result.error: ', result.error);
-    if (result.error === 'invalid_grant') throw Error(RBAuthErrors.INVALID_GRANT);
-    return Auth0Api.mapTokens(result as RawTokensType);
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) {
+          console.log('Auth0Api::refresh result.error: ', res.error);
+          if (res.error === 'invalid_grant') throw Error(RBAuthErrors.INVALID_GRANT);
+        }
+      })
+      .build<RawTokensType>();
+
+    return Auth0Api.mapTokens(res);
   };
 
   // https://auth0.com/docs/logout
   // await Auth0Api.revoke();
   static logout = async () =>
-    new RequestBuilder(`https://${AUTH0_DOMAIN}/v2/logout`).withMode('no-cors').buildText();
+    new RequestBuilder(`https://${AUTH0_DOMAIN}/v2/logout`).withMode('no-cors').build();
 
   static revoke = (tokens: RBAuthTokensType = TokenUtil.getTokens()) =>
     tokens.refreshToken &&
@@ -97,6 +101,9 @@ export class Auth0Api {
       })
       .withHeaders(new HeadersBuilder().withContentTypeJson().build())
       .withMode('no-cors')
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) throw Error(res.error);
+      })
       .build();
 
   static signup = (name: string, email: string, password: string) =>
@@ -113,13 +120,19 @@ export class Auth0Api {
         name,
         password,
       })
-      .buildJson();
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) throw Error(res.error);
+      })
+      .build();
 
   static getUser = <U>(tokenType: string, accessToken: string): Promise<U> =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
       .withMethod(HTTPMethod.GET)
       .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
-      .buildJson();
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) throw Error(res.error);
+      })
+      .build();
 
   static getUserInfo = <U>(
     tokenType: string,
@@ -131,5 +144,8 @@ export class Auth0Api {
       .withHeaders(
         new HeadersBuilder().withToken(tokenType, accessToken).withContentTypeJson().build()
       )
-      .buildJson();
+      .withErrorHandling<AuthError>((res) => {
+        if (res.error) throw Error(res.error);
+      })
+      .build();
 }
