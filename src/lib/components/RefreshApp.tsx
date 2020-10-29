@@ -11,31 +11,39 @@ export const RefreshApp: React.FC<{
   AuthReloadingComp: React.FC;
   AuthLoadingComp?: React.FC;
   authCallbackRoute?: string;
-}> = (props) => {
+  debug?: boolean;
+}> = ({
+  children,
+  locationPathName,
+  AuthReloadingComp,
+  AuthLoadingComp = undefined,
+  authCallbackRoute,
+  debug = false,
+}) => {
   const auth = useContext(AuthContext);
   const [isReloading, setIsReloading] = useState(true);
 
   useEffect(() => {
-    if (auth.reloading && props.AuthLoadingComp !== undefined) setIsReloading(true);
+    if (auth.reloading && AuthLoadingComp !== undefined) setIsReloading(true);
     else setIsReloading(false);
-  }, [auth.reloading, props.AuthLoadingComp]);
+  }, [auth.reloading, AuthLoadingComp]);
 
   const silentSwallow = () => null;
 
   useEffect(() => {
-    if (!FirstRun.done && props.locationPathName !== props.authCallbackRoute) {
+    if (!FirstRun.done && locationPathName !== authCallbackRoute) {
       FirstRun.done = true;
-      console.log('will issue silent auth');
+      if (debug) console.log('will issue silent auth');
       auth.logic.silent().then(silentSwallow).catch(silentSwallow);
     }
   }, []);
 
-  if (!FirstRun.done && props.AuthReloadingComp) return <props.AuthReloadingComp />;
+  if (!FirstRun.done && AuthReloadingComp) return <AuthReloadingComp />;
   else
     return (
       <>
-        {isReloading && props.AuthLoadingComp && <props.AuthLoadingComp />}
-        {props.children}
+        {isReloading && AuthLoadingComp && <AuthLoadingComp />}
+        {children}
       </>
     );
 };

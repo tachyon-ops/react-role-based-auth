@@ -18,11 +18,11 @@ class RequestWrapper {
     accessTokenError = RBAuthErrors.UNAUTHORIZED,
     refresTokenError = RBAuthErrors.INVALID_GRANT
   ): Promise<void> => {
-    console.log('RequestWrapper::recursion');
+    // console.log('RequestWrapper::recursion');
     try {
-      console.log('RequestWrapper::recursion will request');
+      // console.log('RequestWrapper::recursion will request');
       await req();
-      console.log('RequestWrapper::recursion has request');
+      // console.log('RequestWrapper::recursion has request');
     } catch (e) {
       if (e.message === accessTokenError && recursion >= 1) {
         try {

@@ -46,23 +46,25 @@ type RefreshTokenEndLifeCallbackType = (rbAuthErros: RBAuthErrors, error?: Error
 const dummyFunction = () => new Promise((r) => r());
 
 export class BaseAuthApiWrapper<
-  LoginType extends KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }>,
-  LogOutType extends UnknownAuthProcess,
-  SignUpType extends KnownAuthProcess<unknown>,
-  SilentType extends KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }>,
-  HandleType extends KnownAuthProcess<{
-    tokens: RBAuthTokensType;
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
-  }>,
-  RefreshType extends KnownAuthProcess<RBAuthTokensType>,
-  AppApis extends Record<string, unknown>
-> extends UserReloader implements AuthApiInterface {
+    LoginType extends KnownAuthProcess<{
+      tokens: RBAuthTokensType;
+      user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+    }>,
+    LogOutType extends UnknownAuthProcess,
+    SignUpType extends KnownAuthProcess<unknown>,
+    SilentType extends KnownAuthProcess<{
+      tokens: RBAuthTokensType;
+      user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+    }>,
+    HandleType extends KnownAuthProcess<{
+      tokens: RBAuthTokensType;
+      user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+    }>,
+    RefreshType extends KnownAuthProcess<RBAuthTokensType>,
+    AppApis extends Record<string, unknown>
+  >
+  extends UserReloader
+  implements AuthApiInterface {
   defaultLogin: LoginType = dummyFunction as LoginType;
   defaultLogout: LogOutType = dummyFunction as LogOutType;
   defaultSignupLogic: SignUpType = dummyFunction as SignUpType;
@@ -129,13 +131,12 @@ export class BaseAuthApiWrapper<
   private embedWrapperLogicIntoApis(apis: AppApis) {
     const result: Record<string, unknown> = {};
     Object.keys(apis).forEach((item) => {
-      if (item.startsWith('logic') && apis[item] && isFunction(apis[item]))
+      if (item.startsWith('logic') && apis[item] && typeof apis[item] === 'function')
         result[item] = this.apiWrap(apis[item] as <T>() => Promise<T>);
-      else if (isObject(apis[item]))
+      else if (apis[item] !== null && typeof apis[item] === 'object')
         result[item] = this.embedWrapperLogicIntoApis(apis[item] as AppApis);
       else result[item] = apis[item];
     });
-    console.log('embedWrapperLogicIntoApis: ', result);
     return result;
   }
 
@@ -167,7 +168,7 @@ export class BaseAuthApiWrapper<
     onSuccess: <T>(arg: T) => void,
     onError: (error: RBAuthErrors) => void
   ) => {
-    console.log('inside apiWrap');
+    // console.log('inside apiWrap');
     return new ApiAccessBuilder(logic)
       .withSuccess(onSuccess)
       .withFailure(onError)
@@ -181,7 +182,7 @@ export class BaseAuthApiWrapper<
     try {
       return await logic();
     } catch (e) {
-      console.log('wrap catch: ', e.message);
+      // console.log('wrap catch: ', e.message);
       if (e.message === 'Failed to fetch') this.errorCallback(RBAuthErrors.FAILLED_TO_FETCH, e);
       // others
       else if (e.message === RBAuthErrors.UNAUTHORIZED) this.errorCallback(e);

@@ -10,14 +10,15 @@ export const Auth: React.FC<{
   routes?: { private: string; public: string };
   onAuthExpired?: (e: RBAuthErrors) => void;
   appApis?: Record<string, unknown>;
-}> = ({ children, authApi, routes, onAuthExpired, appApis = {} }) => {
+  monitorUserChanges?: null | ((user: RBAuthUserModelWithRole<RBAuthBaseRoles> | null) => void);
+}> = ({ children, authApi, routes, onAuthExpired, appApis = {}, monitorUserChanges = null }) => {
   const [reloading, setReloading] = React.useState(true);
   const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles> | null>(null);
 
   const logic = new BaseAuthApiWrapper(setReloading, setUser, authApi, onAuthExpired, appApis);
 
   useEffect(() => {
-    console.log('user changed: ', user);
+    if (monitorUserChanges) monitorUserChanges(user);
   }, [user]);
 
   const contextVal: RBAuthContextType = {
