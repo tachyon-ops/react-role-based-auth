@@ -53,6 +53,7 @@ export class RequestBuilder {
     if (this.debug) {
       const debugHeaders: Record<string, string> = {};
       this.headers.forEach((value, key) => (debugHeaders[key] = value));
+      // eslint-disable-next-line no-console
       console.log(
         'will request: ',
         this.route,

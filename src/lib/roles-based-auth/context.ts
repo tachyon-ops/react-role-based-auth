@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { createContext } from 'react';
 import { RBAuthTokensType } from '../index';
 

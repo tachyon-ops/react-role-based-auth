@@ -57,6 +57,7 @@ export class AuthApi implements PartialAuthApi {
     try {
       const t = await getTokens();
       const user = await Auth0Api.getUser<UserApiType<U>>(t.tokenType, t.accessToken);
+      // eslint-disable-next-line no-console
       console.log('user: ', user);
 
       // get role
@@ -65,6 +66,7 @@ export class AuthApi implements PartialAuthApi {
         t.accessToken,
         user.sub
       );
+      // eslint-disable-next-line no-console
       console.log('userInfo: ', userInfo);
       // TODO: if needed, we can all stuff to the user console.log('userInfo: ', userInfo);
       let role = anonUser.role;
@@ -78,6 +80,7 @@ export class AuthApi implements PartialAuthApi {
         } as U,
       };
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log('authWrapper catch: ', error);
       const newUser: U = (anonUser as unknown) as U;
       return { tokens: null, user: newUser };

@@ -12,7 +12,6 @@ import {
 import { RBAuthInitialToken } from '../roles-based-auth/context';
 import { RBAuthBaseRoles } from '../index';
 import { TokenUtil } from './TokenUtilities';
-import { isObject, isFunction } from 'util';
 
 type AuthProcessResponse = KnownAuthProcess<{
   tokens: RBAuthTokensType;

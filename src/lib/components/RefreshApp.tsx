@@ -33,6 +33,7 @@ export const RefreshApp: React.FC<{
   useEffect(() => {
     if (!FirstRun.done && locationPathName !== authCallbackRoute) {
       FirstRun.done = true;
+      // eslint-disable-next-line no-console
       if (debug) console.log('will issue silent auth');
       auth.logic.silent().then(silentSwallow).catch(silentSwallow);
     }

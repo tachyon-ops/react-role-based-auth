@@ -76,6 +76,7 @@ export class Auth0Api {
       })
       .withErrorHandling<AuthError>((res) => {
         if (res.error) {
+          // eslint-disable-next-line no-console
           console.log('Auth0Api::refresh result.error: ', res.error);
           if (res.error === 'invalid_grant') throw Error(RBAuthErrors.INVALID_GRANT);
         }

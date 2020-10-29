@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useContext, useState } from 'react';
 import { AppAuthContext } from '../services/AppAuthContext';
 import { Utils } from '../services/Utils';

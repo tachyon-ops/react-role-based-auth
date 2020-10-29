@@ -17,10 +17,12 @@ export const AuthCallback: React.FC<Props> = ({ children, locationHash, Redirect
         return <></>;
       }
       if (Redirect) return <Redirect to={auth.routes.public} />;
-      else
+      else {
+        // eslint-disable-next-line no-console
         console.log(
           'AuthCallback has no redirect, be sure handleAuthentication has programatic redirection'
         );
+      }
       return <>{children}</>;
     }}
   </AuthContext.Consumer>

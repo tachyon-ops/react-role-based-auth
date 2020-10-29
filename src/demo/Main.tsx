@@ -44,12 +44,14 @@ export const Main: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log('is initiated: ', initiated);
   }, [initiated]);
 
   const onAuthExpired = (errorMsg: RBAuthErrors, error?: Error) =>
     setTimeout(() => {
       alert(errorMsg);
+      // eslint-disable-next-line no-console
       error && console.log(error);
     });
 

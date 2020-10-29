@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { RBAuthStorageType, TokenUtil, RBAuthTokensType } from 'react-rb-auth';
 
 const TOKENS_KEY = 'react_rb_auth_tokens';
