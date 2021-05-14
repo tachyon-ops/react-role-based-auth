@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from '../utils/FetchWithTimeout';
+
 export enum HTTPMethod {
   POST = 'POST',
   GET = 'GET',
@@ -70,16 +72,20 @@ export class RequestBuilder {
     if (this.mode) opts.mode = this.mode;
     if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body)
       opts['body'] = JSON.stringify(this.body);
-    return fetch(this.route, opts);
+    return fetchWithTimeout(this.route, opts);
   }
 
   async build<T>(): Promise<T> {
-    let result: T;
+    let result: unknown;
     const res = await this.request();
     const contentType = res.headers.get('content-type');
+    const success = res.ok;
     if (contentType && contentType.indexOf('application/json') !== -1) result = await res.json();
-    else result = ((await res.text()) as unknown) as T;
-    if (this.errorHandling) this.errorHandling(result);
-    return result;
+    else result = (await res.text()) as unknown;
+    if (!success) {
+      if (this.errorHandling) this.errorHandling(result);
+      throw Error(result as string);
+    }
+    return result as T;
   }
 }
