@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT = 7000;
+export const DEFAULT_TIMEOUT = 7000;
 
 export const fetchWithTimeout = (
   requestInfo: RequestInfo,

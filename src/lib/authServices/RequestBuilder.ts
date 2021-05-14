@@ -1,4 +1,4 @@
-import { fetchWithTimeout } from '../utils/FetchWithTimeout';
+import { DEFAULT_TIMEOUT, fetchWithTimeout } from '../utils/FetchWithTimeout';
 
 export enum HTTPMethod {
   POST = 'POST',
@@ -22,6 +22,7 @@ export class RequestBuilder {
   private mode: ModeType | null = null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private errorHandling: ErrorHandlerType<any> | null = null;
+  private timeout: number = DEFAULT_TIMEOUT;
 
   constructor(route: string, private debug = false) {
     this.route = route;
@@ -51,6 +52,10 @@ export class RequestBuilder {
     this.mode = mode;
     return this;
   }
+  withTimeout(timeout: number) {
+    this.timeout = timeout;
+    return this;
+  }
   private request() {
     if (this.debug) {
       const debugHeaders: Record<string, string> = {};
@@ -72,7 +77,7 @@ export class RequestBuilder {
     if (this.mode) opts.mode = this.mode;
     if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body)
       opts['body'] = JSON.stringify(this.body);
-    return fetchWithTimeout(this.route, opts);
+    return fetchWithTimeout(this.route, opts, this.timeout);
   }
 
   async build<T>(): Promise<T> {
