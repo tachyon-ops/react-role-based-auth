@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 
-import { RBAuthUserModelWithRole, RBAuthBaseRoles, RBAuthContextType } from '..';
+import { RBAuthUserModelWithRole, RBAuthBaseRoles, RBAuthContextType, PartialAuthApi, RBAuthErrors } from '../types';
 import { BaseAuthApiWrapper } from '../authServices/BaseAuthApiWrapper';
 import { AuthContext, RBAuthInitialUser } from '../roles-based-auth/context';
-import { PartialAuthApi, RBAuthErrors } from '../index';
 
 export const Auth: React.FC<{
   authApi: PartialAuthApi;

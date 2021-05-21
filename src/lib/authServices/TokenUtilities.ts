@@ -1,4 +1,4 @@
-import { RBAuthTokensType, RBAuthStorageType } from '..';
+import { RBAuthTokensType, RBAuthStorageType } from '../types';
 
 import { RBAuthInitialToken } from '../roles-based-auth/context';
 

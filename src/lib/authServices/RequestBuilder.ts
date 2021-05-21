@@ -59,15 +59,9 @@ export class RequestBuilder {
   private request() {
     if (this.debug) {
       const debugHeaders: Record<string, string> = {};
-      this.headers.forEach((value, key) => (debugHeaders[key] = value));
+      this.headers.forEach((value: string, key: string) => (debugHeaders[key] = value));
       // eslint-disable-next-line no-console
-      console.log(
-        'will request: ',
-        this.route,
-        this.method,
-        JSON.stringify(debugHeaders),
-        JSON.stringify(this.body)
-      );
+      console.log('will request: ', this.route, this.method, JSON.stringify(debugHeaders), JSON.stringify(this.body));
     }
 
     const opts: { method: HTTPMethod; headers: Headers; mode?: ModeType; body?: string } = {
@@ -75,8 +69,7 @@ export class RequestBuilder {
       headers: this.headers,
     };
     if (this.mode) opts.mode = this.mode;
-    if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body)
-      opts['body'] = JSON.stringify(this.body);
+    if (this.method !== HTTPMethod.GET && this.method !== HTTPMethod.HEAD && this.body) opts['body'] = JSON.stringify(this.body);
     return fetchWithTimeout(this.route, opts, this.timeout);
   }
 
