@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { AuthContext, RBAuthRedirect } from '..';
+import { AuthContext } from '../roles-based-auth/context';
+import { RBAuthRedirect } from '../types';
 
 /**
  * TODO: test this component with something like Auth0
@@ -19,9 +20,7 @@ export const AuthCallback: React.FC<Props> = ({ children, locationHash, Redirect
       if (Redirect) return <Redirect to={auth.routes.public} />;
       else {
         // eslint-disable-next-line no-console
-        console.log(
-          'AuthCallback has no redirect, be sure handleAuthentication has programatic redirection'
-        );
+        console.log('AuthCallback has no redirect, be sure handleAuthentication has programatic redirection');
       }
       return <>{children}</>;
     }}

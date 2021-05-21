@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import { AuthContext } from '..';
+import { AuthContext } from '../roles-based-auth/context';
 
 class FirstRun {
   public static done = false;
@@ -28,14 +28,17 @@ export const RefreshApp: React.FC<{
     else setIsReloading(false);
   }, [auth.reloading, AuthLoadingComp]);
 
-  const silentSwallow = () => null;
+  const silentSwallow = () => {};
 
   useEffect(() => {
     if (!FirstRun.done && locationPathName !== authCallbackRoute) {
       FirstRun.done = true;
       // eslint-disable-next-line no-console
-      if (debug) console.log('will issue silent auth');
-      auth.logic.silent().then(silentSwallow).catch(silentSwallow);
+      if (debug) {
+        console.log('will issue silent auth');
+        auth.logic.silent().then(console.log).catch(console.log);
+      }
+      else auth.logic.silent().then(silentSwallow).catch(silentSwallow);
     }
   }, []);
 

@@ -1,13 +1,9 @@
 /* eslint-disable no-console */
 import { createContext } from 'react';
-import { RBAuthTokensType } from '../index';
 
-import {
-  RBAuthContextType,
-  RBAuthReactContext,
-  RBAuthUserModelWithRole,
-  RBAuthBaseRoles,
-} from '..';
+import { RBAuthTokensType } from '../types';
+
+import { RBAuthContextType, RBAuthReactContext, RBAuthUserModelWithRole, RBAuthBaseRoles } from '../types';
 
 export const RBAuthInitialUser: RBAuthUserModelWithRole<RBAuthBaseRoles> = {
   role: 'public',

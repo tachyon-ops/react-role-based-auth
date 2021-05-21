@@ -1,4 +1,4 @@
-import { RBAuthErrors } from '../index';
+import { RBAuthErrors } from '../types';
 
 const RECUR_LEVEL = 1;
 
@@ -29,15 +29,7 @@ class RequestWrapper {
           // refresh
           await refresh();
           // then
-          return RequestWrapper.recursion(
-            refresh,
-            req,
-            onSuccess,
-            onFailure,
-            recursion - 1,
-            accessTokenError,
-            refresTokenError
-          );
+          return RequestWrapper.recursion(refresh, req, onSuccess, onFailure, recursion - 1, accessTokenError, refresTokenError);
         } catch (error) {
           onFailure(RBAuthErrors.REFRESH_TOKEN_REVOKED);
           throw new Error(RBAuthErrors.REFRESH_TOKEN_REVOKED);
@@ -69,15 +61,7 @@ class RequestWrapper {
      * @param refresh Logic for refreshing tokens
      */
     return (refreshLogic: RefreshType) => async () =>
-      RequestWrapper.recursion(
-        refreshLogic,
-        request,
-        onSuccess,
-        onFailure,
-        recursion,
-        accessTokenError,
-        refresTokenError
-      );
+      RequestWrapper.recursion(refreshLogic, request, onSuccess, onFailure, recursion, accessTokenError, refresTokenError);
   }
 }
 

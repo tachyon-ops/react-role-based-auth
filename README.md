@@ -178,6 +178,11 @@ Just fork and do a PR :) I will add you to the colaborators list with a BIG than
 
 - If you want to buy me a coffee or a beer as a thank you, I'm very much appreciated :stuck_out_tongue_winking_eye: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D3J2WXTXLAWK8&source=url)
 
+## Roadmap
+
+### TODO list
+- [x] ~~RequestBuilder timeout [Fetch with timeout](https://dmitripavlutin.com/timeout-fetch-request/ ) ~~
+
 ### Guidelines
 
 Whenever a new `master` is deployed, it should be tagged with the new deployed version.

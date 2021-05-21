@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 
-import { RBAuthBaseRoles, RBAuthRulesInterface, AuthContext } from '..';
+import { RBAuthBaseRoles, RBAuthRulesInterface } from '../types';
+import { AuthContext } from '../roles-based-auth/context';
 
 /**
  * Types
@@ -43,14 +44,6 @@ interface CanProps {
   yes?: () => ReactElement;
   no?: () => ReactElement;
 }
-export const Can: React.FC<CanProps> = ({
-  role,
-  perform,
-  data = {},
-  yes = () => null,
-  no = () => null,
-}) => (
-  <AuthContext.Consumer>
-    {({ rules }) => (check(rules, role, perform, data) ? yes() : no())}
-  </AuthContext.Consumer>
+export const Can: React.FC<CanProps> = ({ role, perform, data = {}, yes = () => null, no = () => null }) => (
+  <AuthContext.Consumer>{({ rules }) => (check(rules, role, perform, data) ? yes() : no())}</AuthContext.Consumer>
 );

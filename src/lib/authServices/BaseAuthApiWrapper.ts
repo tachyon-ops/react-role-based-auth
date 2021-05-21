@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { TokenUtil } from './TokenUtilities';
+import { ApiAccessBuilder } from './RequestWrapper';
+
 import {
   UnknownAuthProcess,
   SetterType,
@@ -7,11 +10,9 @@ import {
   RBAuthUserModelWithRole,
   KnownAuthProcess,
   RBAuthErrors,
-  ApiAccessBuilder,
-} from '..';
+  RBAuthBaseRoles,
+} from '../types';
 import { RBAuthInitialToken } from '../roles-based-auth/context';
-import { RBAuthBaseRoles } from '../index';
-import { TokenUtil } from './TokenUtilities';
 
 type AuthProcessResponse = KnownAuthProcess<{
   tokens: RBAuthTokensType;
@@ -42,7 +43,7 @@ abstract class UserReloader {
 
 type RefreshTokenEndLifeCallbackType = (rbAuthErros: RBAuthErrors, error?: Error) => void;
 
-const dummyFunction = () => new Promise((r) => r());
+const dummyFunction = (arg: unknown) => new Promise<unknown>((r) => r(arg));
 
 export class BaseAuthApiWrapper<
     LoginType extends KnownAuthProcess<{

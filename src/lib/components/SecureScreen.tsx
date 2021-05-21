@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { AuthContext, RBAuthRedirect } from '..';
+import { RBAuthRedirect } from '../types';
+import { AuthContext } from '../roles-based-auth/context';
 
 export const SecureScreen: React.FC<{
   Redirect: RBAuthRedirect;

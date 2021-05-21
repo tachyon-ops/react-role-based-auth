@@ -22,10 +22,7 @@ export class HeadersBuilder {
   }
 
   withRBAuthToken() {
-    this.headers.append(
-      'Authorization',
-      `${TokenUtil.getTokens().tokenType} ${TokenUtil.getTokens().accessToken}`
-    );
+    this.headers.append('Authorization', `${TokenUtil.getTokens().tokenType} ${TokenUtil.getTokens().accessToken}`);
     return this;
   }
 
