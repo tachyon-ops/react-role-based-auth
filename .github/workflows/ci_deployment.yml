@@ -1,0 +1,42 @@
+name: CI Deployment
+
+on:
+  push: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: yarn install
+        run: |
+          yarn install
+      - name: yarn test
+        run: |
+          yarn test
+        env:
+          CI: true
+      - name: yarn deploy
+        run: |
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+          yarn deploy
+        env:
+          NODE_ENV: development
+          REACT_APP_AUTH0_DOMAIN: react-rb-auth.eu.auth0.com
+          REACT_APP_AUTH0_CLIENT_ID: IQHjsH8rbRctSLd2dqErP3SC6WJ4mqx5
+          REACT_APP_AUTH0_AUDIENCE: https://react-rb-auth.eu.auth0.com/api/v2/
+          CI: true

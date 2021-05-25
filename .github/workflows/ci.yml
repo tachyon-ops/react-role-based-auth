@@ -9,10 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # strategy:
-    #   matrix:
-    #     node-version: [14.x]
-
     steps:
       - uses: actions/checkout@v2
 
@@ -28,12 +24,4 @@ jobs:
         run: |
           yarn test
         env:
-          CI: true
-      - name: yarn deploy
-        run: yarn deploy
-        env:
-          NODE_ENV: development
-          REACT_APP_AUTH0_DOMAIN: react-rb-auth.eu.auth0.com
-          REACT_APP_AUTH0_CLIENT_ID: IQHjsH8rbRctSLd2dqErP3SC6WJ4mqx5
-          REACT_APP_AUTH0_AUDIENCE: https://react-rb-auth.eu.auth0.com/api/v2/
           CI: true
