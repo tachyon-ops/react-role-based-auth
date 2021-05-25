@@ -1,8 +1,7 @@
 name: CI Deployment
 
 on:
-  push: [ master ]
-  pull_request:
+  push:
     branches: [ master ]
 
 jobs:
