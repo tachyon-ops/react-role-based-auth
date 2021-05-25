@@ -1,6 +1,6 @@
 # React Role Based Auth
 
-Role based auth for redux. Have a look here: [nmpribeiro.github.io/react-role-based-auth](https://nmpribeiro.github.io/react-role-based-auth/) - on browser refresh, you'll be logged in automatically (it's just a boolean :bowtie: )
+Role based auth for redux. Have a look here: [nmpribeiro.github.io/react-role-based-auth](https://nmpribeiro.github.io/react-role-based-auth/) - login with user: example@example.com pass: test_2021 on browser refresh, your sessions will persist on reload
 
 ## Usage
 
