@@ -1,6 +1,5 @@
-import { RBAuthTokensType, RBAuthStorageType } from '../types';
-
-import { RBAuthInitialToken } from '../roles-based-auth/context';
+import { RBAuthStorageType, RBAuthTokensType } from '..'
+import { RBAuthInitialToken } from '../roles-based-auth/context'
 
 const initialStorage: RBAuthStorageType = {
   accessToken: '',
@@ -10,16 +9,16 @@ const initialStorage: RBAuthStorageType = {
   expiresIn: '',
   scope: '',
   setTokens: () => null,
-};
+}
 
 export class TokenUtil {
-  private static s: RBAuthStorageType = initialStorage;
+  private static s: RBAuthStorageType = initialStorage
 
   static setStorage(storage: RBAuthStorageType) {
-    TokenUtil.s = storage;
+    TokenUtil.s = storage
   }
 
-  static setTokens = (t: RBAuthTokensType = RBAuthInitialToken) => TokenUtil.s.setTokens(t);
+  static setTokens = (t: RBAuthTokensType = RBAuthInitialToken) => TokenUtil.s.setTokens(t)
 
   static getTokens(): RBAuthTokensType {
     return {
@@ -29,6 +28,6 @@ export class TokenUtil {
       tokenType: TokenUtil.s.tokenType || '',
       expiresIn: TokenUtil.s.expiresIn || '',
       scope: TokenUtil.s.scope || '',
-    };
+    }
   }
 }

@@ -18,7 +18,7 @@ export const RefreshApp: React.FC<{
   AuthReloadingComp,
   AuthLoadingComp = undefined,
   authCallbackRoute,
-  debug = false
+  debug = false,
 }) => {
   const auth = useContext(AuthContext)
   const [isReloading, setIsReloading] = useState(true)
