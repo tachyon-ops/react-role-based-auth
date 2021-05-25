@@ -14,7 +14,7 @@ import { rules } from '../models/rules'
 
 type GlobalApi = typeof GlobalAppApi
 
-const AppAuthContext = AuthContext as RBAuthReactContext<
+export const AppAuthContext = AuthContext as RBAuthReactContext<
   UserModel,
   typeof rules,
   LoginType,
@@ -25,5 +25,3 @@ const AppAuthContext = AuthContext as RBAuthReactContext<
   RefreshType,
   GlobalApi
 >
-
-export { AppAuthContext }

@@ -10,6 +10,6 @@ class ExternalApi {
       .build();
 }
 
-export const GlobalAppApi = {
+export const GlobalAppApi: Record<string, unknown> = {
   external: new ExternalApi(),
 };

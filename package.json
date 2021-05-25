@@ -1,6 +1,6 @@
 {
   "name": "react-rb-auth",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Simple Role Based Auth for react projects",
   "author": "TachyonVFX, LDA <info@tachyonvfx.com>",
   "license": "MIT",
@@ -32,7 +32,7 @@
   "scripts": {
     "build": "microbundle-crl --no-compress --format modern,cjs",
     "start-lib": "microbundle-crl watch --no-compress --format modern,cjs",
-    "start": "yarn prepare && yarn predeploy && cd example && npm run start",
+    "start": "yarn prepare && yarn predeploy && yarn deploy",
     "prepare": "run-s build",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",

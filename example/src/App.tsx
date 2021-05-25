@@ -22,7 +22,7 @@ const AppLink: React.FC<{ to: string; label: string }> = ({ to, label }) => (
   </div>
 );
 
-const App: React.FC = () => (
+export const App: React.FC = () => (
   <>
     <Example />
     <div className="Example appBounding">
@@ -48,5 +48,3 @@ const App: React.FC = () => (
     <SecondExample />
   </>
 );
-
-export default App;

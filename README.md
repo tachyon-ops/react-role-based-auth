@@ -1,6 +1,6 @@
 # React Role Based Auth
 
-Role based auth for redux. Have a look here: [react-rb-auth.herokuapp.com](https://react-rb-auth.herokuapp.com/) - on browser refresh, you'll be logged in automatically (it's just a boolean :bowtie: )
+Role based auth for redux. Have a look here: [nmpribeiro.github.io/react-role-based-auth](https://nmpribeiro.github.io/react-role-based-auth/) - on browser refresh, you'll be logged in automatically (it's just a boolean :bowtie: )
 
 ## Usage
 
@@ -20,55 +20,129 @@ Inside **src/demo** folder, you can test your library while developing.
 
 ## How to use
 
-### Context handling
+### Main and App from example
 
-This library supplies you with a context to handle all Authentication state in the whole app for you. You will need to construct an AuthClass where you manage all your Authentication logic.
-
-#### Your Auth class
-
-This library can't know your `UserModel` nor how your backend expects auth to work out, so you will have to create a class for all your `Auth` logic:
+Our `Main` encapsulates all necessary Auth bootstrapping, including setting the `TokenUtil` storage (this allows implementation decoupling for `localStorage` in browsers or `async storage` in mobile react-native apps), `AuthApi`, `AuthReloading` for when you are reloading the app (refresh), `AuthLoading` for when your are loggin in, and other auth specific utilities.
 
 ```typescript
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { Auth, TokenUtil, RefreshApp, RBAuthErrors } from 'react-rb-auth'
 
-import { UserModel, anonUser, regUser } from '../models/user';
-import { AppAuthContext } from './AppAuthContext';
+import { App } from './App'
+import { AuthApi } from './services/AuthApi'
+import { GlobalAppApi } from './services/ExternalApi'
+import { AppStorage } from './services/AppLocalStorage'
 
-const Auth: React.FC = ({ children }) => {
-  const [authenticated, setAuth] = useState(false);
-  const [user, setUser] = useState<UserModel>(anonUser);
+const AuthReloading: React.FC = () => (
+  <Spinner>
+    <h3>AuthReloading</h3>
+  </Spinner>
+)
+const AuthLoading: React.FC = () => (
+  <Spinner>
+    <h3>AuthLoading</h3>
+  </Spinner>
+)
+const Spinner: React.FC = ({ children }) => (
+  <div
+    style={{
+      position: 'absolute',
+      display: 'flex',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'white',
+    }}
+  >
+    <div style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      {children}
+    </div>
+  </div>
+)
 
-  const login = () => {
-    setAuth(true);
-    setUser(regUser);
-  };
-  const logout = () => {
-    setAuth(false);
-    setUser(anonUser);
-  };
+export const Main: React.FC = () => {
+  const [initiated, setInitiated] = useState(false)
 
-  const setupAuthVal = () => ({
-    authenticated,
-    reloading: false,
-    accessToken: 'is_it_an_access_token?',
-    login: login,
-    logout: logout,
-    handleAuthentication: () => null,
-    silentAuth: () => null,
-    routes: {
-      public: '/',
-      private: '/admin',
-    },
-    user,
-  });
+  useEffect(() => {
+    TokenUtil.setStorage(new AppStorage(setInitiated))
+  }, [])
 
-  return <AppAuthContext.Provider value={setupAuthVal()}>{children}</AppAuthContext.Provider>;
-};
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('is initiated: ', initiated)
+  }, [initiated])
 
-export default Auth;
+  const onAuthExpired = (errorMsg: RBAuthErrors, error?: Error) =>
+    setTimeout(() => {
+      alert(errorMsg)
+      // eslint-disable-next-line no-console
+      error && console.log(error)
+    })
+
+  if (!initiated) return <></>
+
+  return (
+    <Auth
+      authApi={AuthApi}
+      routes={{ private: '/super-secure', public: '/' }}
+      onAuthExpired={onAuthExpired}
+      appApis={GlobalAppApi}
+    >
+      <RefreshApp
+        locationPathName={'none'}
+        AuthReloadingComp={AuthReloading}
+        AuthLoadingComp={AuthLoading}
+      >
+        <App />
+      </RefreshApp>
+    </Auth>
+  )
+}
 ```
 
-`BrowserRefresh` logic can be seen on the accompaning `src/demo` sample App.
+Now, in your `App` you can have the following snippet:
+
+```typescript
+<BrowserRefresh AuthReloadingComp={Reloading}>
+  <Switch>
+    <SecureRoute
+      path='/secure'
+      Allowed={() => <h3>Secure area</h3>}
+      NotAllowed={() => <h3>You are not allowed</h3>}
+    />
+
+    <SecureRoute path='/super-secure' Allowed={() => <h3>Super Secure area</h3>} />
+  </Switch>
+  <LoginLogout />
+</BrowserRefresh>
+```
+
+Be sure you imported `import { Switch } from 'react-router-dom';`.
+
+`BrowserRefresh` logic:
+
+```typescript
+import React from 'react'
+import { useLocation } from 'react-router-dom'
+import { RefreshApp } from 'react-rb-auth'
+
+export const BrowserRefresh: React.FC<{
+  AuthReloadingComp: React.FC
+  authCallbackRoute?: string
+}> = ({ children, AuthReloadingComp, authCallbackRoute }) => {
+  const location = useLocation()
+  return (
+    <RefreshApp
+      locationPathName={location.pathname}
+      AuthReloadingComp={AuthReloadingComp}
+      authCallbackRoute={authCallbackRoute}
+    >
+      {children}
+    </RefreshApp>
+  )
+}
+```
 
 Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
 
@@ -80,95 +154,137 @@ ReactDOM.render(
     </Auth>
   </Provider>,
   document.getElementById('root')
-);
+)
 ```
 
-#### User model
+### Context handling
 
-But wait, the context `AuthContext` from `import { AuthContext } from 'react-rb-auth';` has no idea about your `UserModel`, so whenever you want to reach your user attributes throughout your codebase, provided `Auth` has been introduced in the DOM tree (usually under your redux store provider), you will need to have the following type casted onto a "custom" `AppAuthContext` of your own:
+This library supplies you with a context to handle all Authentication state in the whole app for you. You will need to construct an AuthClass where you manage all your Authentication logic.
+
+#### Your Auth class and the User model
+
+The context `AuthContext` from `import { AuthContext } from 'react-rb-auth';` has no idea about your specific `UserModel`, so whenever you want to reach your user attributes throughout your codebase, provided `Auth` has been introduced in the DOM tree (usually under your redux store provider), you will need to have the following type casted onto a "custom" `AppAuthContext` of your own:
 
 ```typescript
-import { AuthContext, RBAuthContextType } from 'react-rb-auth';
-import { UserModel } from '../models/user';
+import { AuthContext, RBAuthReactContext } from 'react-rb-auth'
 
-export const AppAuthContext = AuthContext as React.Context<RBAuthContextType<UserModel>>;
+import { LoginType, SignupType, HandleType, SilentType, LogoutType, RefreshType } from './AuthApi'
+import { GlobalAppApi } from './ExternalApi'
+import { UserModel } from '../models/user'
+import { rules } from '../models/rules'
+
+type GlobalApi = typeof GlobalAppApi
+
+export const AppAuthContext = AuthContext as RBAuthReactContext<
+  UserModel,
+  typeof rules,
+  LoginType,
+  LogoutType,
+  SignupType,
+  HandleType,
+  SilentType,
+  RefreshType,
+  GlobalApi
+>
 ```
 
-In this case, `UserModel` is simply an interface `{ name: string, role: BaseRole }` (notice the extra `name` in the Object), being `RBAuthUserModel` imported from `react-rb-auth` lib.
-
-TODO Note: extending 'roles' to be done.
-
 ```typescript
-import { RBAuthUserModel } from 'react-rb-auth';
+import { RBAuthUserModel } from 'react-rb-auth'
 
 export interface UserModel extends RBAuthUserModel {
-  name: string;
+  name: string
 }
 
-export const anonUser: UserModel = { name: '', role: 'visitor' };
-export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' };
+export const anonUser: UserModel = { name: '', role: 'visitor' }
+export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' }
 ```
 
-Now you can use your context like follows, where we combined everything to let you see that even access to `login` and `logout` functionality is in the context.
+### AppAuthContext Types
+
+- You will have to define your own `UserModel` (it follows an example). In this case, `UserModel` is simply an interface `{ name: string, role: AppRole }` (notice the extra `name` in the Object), being `RBAuthUserModel` imported from `react-rb-auth` lib.
 
 ```typescript
-import React from 'react';
+import { RBAuthUserModelWithRole } from 'react-rb-auth'
+import { AppRole } from './role'
 
-import { AppAuthContext } from '../services/AppAuthContext';
+export interface UserModel extends RBAuthUserModelWithRole<AppRole> {
+  name: string
+  role: AppRole
+}
 
-export const LoginLogout: React.FC = (props) => (
+export const anonUser: UserModel = {
+  name: '',
+  role: 'public',
+}
+```
+
+`AppRole`:
+
+```typescript
+import { RBAuthBaseRoles } from 'react-rb-auth'
+
+export type AppRole = 'writer' | RBAuthBaseRoles
+```
+
+- typeof rules, where `rules` is of type `RBAuthRulesInterface<AppRole>`
+- `LoginType`, `LogoutType`, `SignupType`, `HandleType`, `SilentType`, `RefreshType` are all the necessary function types for the auth API (look at `AuthApi.ts` file for an example as they are derived from the necessary Tokens and User type this library uses).
+- `GlobalApi` is a dictionary of multiple APIs. While it is still a WIP, it is being developed to allow us to catch any 'unauthorized' loggin in order for the AuthContext to automatically handle the error. You can override this by using your own apis and handling the exceptions yourself, while if the user is not authorized, you just need to log him out yourself.
+
+Now you can use your context like follows, where we combined everything to let you see that even access to `login` and `logout` functionality is in the context. Notice the commented out `Can` usage here.
+
+```typescript
+import React from 'react'
+// import { Can } from 'react-rb-auth';
+
+import { Login } from './Login'
+import { Logout } from './Profile'
+import { AppAuthContext } from '../services/AppAuthContext'
+
+export const LoginLogout: React.FC = () => (
+  // <Can role="admin" perform="dashboard-page:visit" yes={() => <Logout />} no={() => <Login />} />
   <AppAuthContext.Consumer>
-    {(authContext) => (
-      <div>
-        {!authContext.authenticated && (
-          <div>
-            <h3>You are anonymous</h3>
-            <button onClick={authContext.login}>Login</button>
-          </div>
-        )}
-        {authContext.authenticated && (
-          <div>
-            <h3>Welcome USER!</h3>
-            <h5>Your name is: {authContext.user.name}</h5>
-            <button onClick={authContext.logout}>Logout</button>
-          </div>
-        )}
-        <br />
-        <br />
-      </div>
+    {(auth) => (
+      <>
+        {auth.isAuth && <Logout />}
+        {!auth.isAuth && <Login />}
+      </>
     )}
   </AppAuthContext.Consumer>
-);
+)
 ```
 
 ## Roles
 
-- TODO
+- [ ] TODO: further implement this. A basic implementation is underway and could be used with `Can` component.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start` or `yarn start`
+### `yarn start-lib`
 
-Runs the library in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Builds the library code.
 
-### `npm run test` or `yarn run test`
+### `yarn start`
+
+Builds the library code (`yarn prepare`), then builds the example app (`yarn predeploy`) and finally it deploys the app to GitHub pages (`yarn deploy`).
+
+### Start example
+
+```bash
+# (in another tab)
+
+cd example
+npm start # runs create-react-app dev server
+```
+
+### `yarn test` `yarn test:watch`
 
 Runs the test watcher in an interactive mode.
-
-### `npm run build` or `yarn build`
-
-Builds the library for production to the `build` folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
 ### `npm publish`
 
 Publishes the library to NPM.
-
-## Typescript
-
-[Adding Typescript support](https://gist.github.com/DimiMikadze/f25e1c5c70fa003953afd40fa9042517)
 
 ## I want to help
 
@@ -181,7 +297,9 @@ Just fork and do a PR :) I will add you to the colaborators list with a BIG than
 ## Roadmap
 
 ### TODO list
-- [x] ~~RequestBuilder timeout [Fetch with timeout](https://dmitripavlutin.com/timeout-fetch-request/ ) ~~
+
+- [ ] Properly setup Roles
+- [x] ~~RequestBuilder timeout [Fetch with timeout](https://dmitripavlutin.com/timeout-fetch-request/) ~~
 
 ### Guidelines
 

@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Auth, TokenUtil, RefreshApp, RBAuthErrors } from 'react-rb-auth';
+import React, { useEffect, useState } from 'react'
+import { Auth, TokenUtil, RefreshApp, RBAuthErrors } from 'react-rb-auth'
 
-import { AppStorage } from './services/AppLocalStorage';
-import { AuthApi } from './services/AuthApi';
-
-import App from './App';
-import { GlobalAppApi } from './services/ExternalApi';
+import { App } from './App'
+import { AuthApi } from './services/AuthApi'
+import { GlobalAppApi } from './services/ExternalApi'
+import { AppStorage } from './services/AppLocalStorage'
 
 const AuthReloading: React.FC = () => (
   <Spinner>
     <h3>AuthReloading</h3>
   </Spinner>
-);
+)
 const AuthLoading: React.FC = () => (
   <Spinner>
     <h3>AuthLoading</h3>
   </Spinner>
-);
+)
 const Spinner: React.FC = ({ children }) => (
   <div
     style={{
@@ -33,28 +32,28 @@ const Spinner: React.FC = ({ children }) => (
       {children}
     </div>
   </div>
-);
+)
 
 export const Main: React.FC = () => {
-  const [initiated, setInitiated] = useState(false);
+  const [initiated, setInitiated] = useState(false)
 
   useEffect(() => {
-    TokenUtil.setStorage(new AppStorage(setInitiated));
-  }, []);
+    TokenUtil.setStorage(new AppStorage(setInitiated))
+  }, [])
 
   useEffect(() => {
     // eslint-disable-next-line no-console
-    console.log('is initiated: ', initiated);
-  }, [initiated]);
+    console.log('is initiated: ', initiated)
+  }, [initiated])
 
   const onAuthExpired = (errorMsg: RBAuthErrors, error?: Error) =>
     setTimeout(() => {
-      alert(errorMsg);
+      alert(errorMsg)
       // eslint-disable-next-line no-console
-      error && console.log(error);
-    });
+      error && console.log(error)
+    })
 
-  if (!initiated) return <></>;
+  if (!initiated) return <></>
 
   return (
     <Auth
@@ -71,5 +70,5 @@ export const Main: React.FC = () => {
         <App />
       </RefreshApp>
     </Auth>
-  );
-};
+  )
+}
