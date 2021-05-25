@@ -30,4 +30,4 @@ jobs:
         env:
           CI: true
       - name: yarn deploy
-        run: yarn deply
+        run: yarn deploy
