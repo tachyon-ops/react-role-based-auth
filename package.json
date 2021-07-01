@@ -32,7 +32,8 @@
 		"start": "yarn build && yarn deploy",
 		"predeploy": "cd example && yarn install && yarn run build",
 		"deploy": "gh-pages -d example/build",
-		"test": "cd example && yarn test"
+		"test": "cd example && yarn test",
+		"pretest": "cd example && yarn install"
 	},
 	"devDependencies": {
 		"@types/react": "^17.0.12",
