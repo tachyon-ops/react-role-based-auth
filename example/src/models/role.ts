@@ -1,3 +1,3 @@
-import { RBAuthBaseRoles } from 'react-rb-auth';
+import { RBAuthBaseRoles } from "react-rb-auth";
 
-export type AppRole = 'writer' | RBAuthBaseRoles;
+export type AppRole = "writer" | RBAuthBaseRoles;
