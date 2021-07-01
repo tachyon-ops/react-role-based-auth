@@ -26,5 +26,5 @@ jobs:
         run: |
           yarn test
         env:
+          SKIP_PREFLIGHT_CHECK: true
           CI: true
-					SKIP_PREFLIGHT_CHECK: true

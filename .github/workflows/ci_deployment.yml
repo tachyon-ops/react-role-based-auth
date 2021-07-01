@@ -29,8 +29,8 @@ jobs:
         run: |
           yarn test
         env:
+          SKIP_PREFLIGHT_CHECK: true
           CI: true
-					SKIP_PREFLIGHT_CHECK: true
       - name: yarn deploy
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
@@ -41,5 +41,5 @@ jobs:
           REACT_APP_AUTH0_DOMAIN: react-rb-auth.eu.auth0.com
           REACT_APP_AUTH0_CLIENT_ID: IQHjsH8rbRctSLd2dqErP3SC6WJ4mqx5
           REACT_APP_AUTH0_AUDIENCE: https://react-rb-auth.eu.auth0.com/api/v2/
+          SKIP_PREFLIGHT_CHECK: true
           CI: true
-					SKIP_PREFLIGHT_CHECK: true
