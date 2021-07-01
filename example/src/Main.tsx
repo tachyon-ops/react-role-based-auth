@@ -66,6 +66,8 @@ export const Main: React.FC = () => {
         locationPathName={'none'}
         AuthReloadingComp={AuthReloading}
         AuthLoadingComp={AuthLoading}
+        onRefreshFinished={() => console.log('Main::onRefreshFinished')}
+        debug
       >
         <App />
       </RefreshApp>

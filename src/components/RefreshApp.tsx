@@ -11,6 +11,7 @@ export const RefreshApp: React.FC<{
   AuthReloadingComp: React.FC
   AuthLoadingComp?: React.FC
   authCallbackRoute?: string
+  onRefreshFinished?: VoidFunction
   debug?: boolean
 }> = ({
   children,
@@ -18,6 +19,7 @@ export const RefreshApp: React.FC<{
   AuthReloadingComp,
   AuthLoadingComp = undefined,
   authCallbackRoute,
+  onRefreshFinished,
   debug = false,
 }) => {
   const auth = useContext(AuthContext)
@@ -28,16 +30,21 @@ export const RefreshApp: React.FC<{
     else setIsReloading(false)
   }, [auth.reloading, AuthLoadingComp])
 
-  const silentSwallow = () => {}
-
   useEffect(() => {
     if (!FirstRun.done && locationPathName !== authCallbackRoute) {
       FirstRun.done = true
-      // eslint-disable-next-line no-console
-      if (debug) {
-        console.log('will issue silent auth')
-        auth.logic.silent().then(console.log).catch(console.log)
-      } else auth.logic.silent().then(silentSwallow).catch(silentSwallow)
+
+      let silentSwallowFunc = () => {}
+      const onRefreshFinishedHandler = () => {
+        if (debug) console.log('Finished refreshing')
+        if (onRefreshFinished) onRefreshFinished()
+      }
+      if (debug) silentSwallowFunc = console.log
+      auth.logic
+        .silent()
+        .then(silentSwallowFunc)
+        .catch(silentSwallowFunc)
+        .finally(onRefreshFinishedHandler)
     }
   }, [])
 

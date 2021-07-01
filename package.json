@@ -1,6 +1,6 @@
 {
   "name": "react-rb-auth",
-  "version": "2.0.2",
+  "version": "3.0.2",
   "description": "Simple Role Based Auth for react projects",
   "author": "TachyonVFX, LDA <info@tachyonvfx.com>",
   "license": "MIT",
