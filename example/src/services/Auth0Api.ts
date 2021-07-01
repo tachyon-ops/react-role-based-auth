@@ -11,8 +11,6 @@ const AUTH0_DOMAIN = process.env.REACT_APP_AUTH0_DOMAIN;
 const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID;
 const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE;
 
-console.log("process.env: ", process.env);
-
 interface AuthError {
   error: string;
   error_description: string;

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Switch, Link } from 'react-router-dom';
+import React from "react";
+import { Switch, Link } from "react-router-dom";
 
-import { Example } from './components/Example';
-import { SecondExample } from './components/SecondExample';
-import { LoginLogout } from './components/LoginLogout';
-import { BrowserRefresh } from './services/BrowserRefresh';
-import { SecureRoute } from './services/SecureRoute';
+import { Example } from "./components/Example";
+import { SecondExample } from "./components/SecondExample";
+import { LoginLogout } from "./components/LoginLogout";
+import { BrowserRefresh } from "./services/BrowserRefresh";
+import { SecureRoute } from "./services/SecureRoute";
 
 const Reloading: React.FC = () => (
   <div>
@@ -15,7 +15,9 @@ const Reloading: React.FC = () => (
   </div>
 );
 
-const AppMenu: React.FC = ({ children }) => <div className="appMenu">{children}</div>;
+const AppMenu: React.FC = ({ children }) => (
+  <div className="appMenu">{children}</div>
+);
 const AppLink: React.FC<{ to: string; label: string }> = ({ to, label }) => (
   <div className="appLink">
     <Link to={to}>{label}</Link>

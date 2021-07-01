@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 
-import { AuthContext } from "../roles-based-auth/context";
+import { AuthContext } from "react-rb-auth";
 
 class FirstRun {
   public static done = false;
