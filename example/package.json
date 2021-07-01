@@ -11,7 +11,6 @@
 		"@types/react": "link:../node_modules/@types/react",
 		"@types/react-dom": "link:../node_modules/@types/react-dom",
 		"@types/react-router-dom": "^5.1.7",
-		"babel-loader": "^8.2.2",
 		"react": "link:../node_modules/react",
 		"react-dom": "link:../node_modules/react-dom",
 		"react-rb-auth": "link:..",
