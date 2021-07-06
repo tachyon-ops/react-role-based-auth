@@ -87,8 +87,11 @@ export class ApiAccessBuilder {
   private recursions: number = RECUR_LEVEL
   private accessTokenError: RBAuthErrors = RBAuthErrors.INVALID_GRANT
   private refreshTokenError: RBAuthErrors = RBAuthErrors.REFRESH_TOKEN_REVOKED
+  private logic: <T>() => Promise<T>
 
-  constructor(private logic: <T>() => Promise<T>) {}
+  constructor(logic: <T>() => Promise<T>) {
+    this.logic = logic
+  }
 
   withAccessTokenError(accessTokenError: RBAuthErrors) {
     this.accessTokenError = accessTokenError

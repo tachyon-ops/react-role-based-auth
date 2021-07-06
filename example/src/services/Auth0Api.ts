@@ -1,37 +1,37 @@
-import { RBAuthErrors } from 'react-rb-auth';
+import { RBAuthErrors } from 'react-rb-auth'
 import {
   RBAuthTokensType,
   HeadersBuilder,
   RequestBuilder,
   HTTPMethod,
   TokenUtil,
-} from 'react-rb-auth';
+} from 'react-rb-auth'
 
-const AUTH0_DOMAIN = process.env.REACT_APP_AUTH0_DOMAIN;
-const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID;
-const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE;
+const AUTH0_DOMAIN = process.env.REACT_APP_AUTH0_DOMAIN
+const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID
+const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE
 
 interface AuthError {
-  error: string;
-  error_description: string;
+  error: string
+  error_description: string
 }
 
 type RawTokensType = {
-  access_token: string;
-  refresh_token: string;
-  id_token: string;
-  expires_in: string;
-  scope: string;
-  token_type: string;
-};
+  access_token: string
+  refresh_token: string
+  id_token: string
+  expires_in: string
+  scope: string
+  token_type: string
+}
 
 export class Auth0Api {
-  private static connection = 'Username-Password-Authentication';
+  private static connection = 'Username-Password-Authentication'
   // openid for id token
   // offline_access for refresh token
-  private static scope = 'profile openid offline_access';
+  private static scope = 'profile openid offline_access'
 
-  private static auth0body = { client_id: AUTH0_CLIENT_ID, audience: AUTH0_AUDIENCE };
+  private static auth0body = { client_id: AUTH0_CLIENT_ID, audience: AUTH0_AUDIENCE }
 
   static mapTokens(rawTokens: RawTokensType): RBAuthTokensType {
     return {
@@ -41,7 +41,7 @@ export class Auth0Api {
       scope: rawTokens.scope,
       expiresIn: rawTokens.expires_in,
       tokenType: rawTokens.token_type,
-    };
+    }
   }
 
   static authorize = (username: string, password: string): Promise<RawTokensType> =>
@@ -57,15 +57,15 @@ export class Auth0Api {
         password,
       })
       .withErrorHandling<AuthError>((res) => {
-        if (res.error) throw Error(res.error);
+        if (res.error) throw Error(res.error)
       })
-      .build();
+      .build()
 
   // api docs: https://auth0.com/docs/api/authentication#revoke-refresh-token
   static refresh = async (
     refreshToken: string = TokenUtil.getTokens().refreshToken
   ): Promise<RBAuthTokensType> => {
-    if (!refreshToken || refreshToken === '') throw new Error('noRefreshToken');
+    if (!refreshToken || refreshToken === '') throw new Error('noRefreshToken')
     const res = await new RequestBuilder(`https://${AUTH0_DOMAIN}/oauth/token`)
       .withMethod(HTTPMethod.POST)
       .withHeaders(new HeadersBuilder().withContentTypeJson().build())
@@ -100,12 +100,17 @@ export class Auth0Api {
         client_secret: 'gCZVMcdV2q9n7G7jjnZrYEwee1FdAOGV7-b7AnMhJZIzAIGBE6Fb4LMTeIr0XIn0',
         token: tokens.refreshToken,
       })
-      .withHeaders(new HeadersBuilder().withContentTypeJson().build())
-      .withMode('no-cors')
+      .withHeaders(
+        new HeadersBuilder()
+          .withContentTypeJson()
+          .withKeyValuePair('origin', 'http://localhost:3000')
+          .build()
+      )
+      .withMode('same-origin')
       .withErrorHandling<AuthError>((res) => {
-        if (res.error) throw Error(res.error);
+        if (res.error) throw Error(res.error)
       })
-      .build();
+      .build()
 
   static signup = (name: string, email: string, password: string) =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/dbconnections/signup`)
@@ -122,18 +127,18 @@ export class Auth0Api {
         password,
       })
       .withErrorHandling<AuthError>((res) => {
-        if (res.error) throw Error(res.error);
+        if (res.error) throw Error(res.error)
       })
-      .build();
+      .build()
 
   static getUser = <U>(tokenType: string, accessToken: string): Promise<U> =>
     new RequestBuilder(`https://${AUTH0_DOMAIN}/userinfo`)
       .withMethod(HTTPMethod.GET)
       .withHeaders(new HeadersBuilder().withToken(tokenType, accessToken).build())
       .withErrorHandling<AuthError>((res) => {
-        if (res.error) throw Error(res.error);
+        if (res.error) throw Error(res.error)
       })
-      .build();
+      .build()
 
   static getUserInfo = <U>(
     tokenType: string,
@@ -146,7 +151,7 @@ export class Auth0Api {
         new HeadersBuilder().withToken(tokenType, accessToken).withContentTypeJson().build()
       )
       .withErrorHandling<AuthError>((res) => {
-        if (res.error) throw Error(res.error);
+        if (res.error) throw Error(res.error)
       })
-      .build();
+      .build()
 }
