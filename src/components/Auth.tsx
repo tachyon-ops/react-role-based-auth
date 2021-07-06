@@ -12,6 +12,7 @@ export const Auth: React.FC<{
   appApis?: Record<string, unknown>
   monitorUserChanges?: null | ((user: RBAuthUserModelWithRole<RBAuthBaseRoles> | null) => void)
   isAuthLogic?: (user: RBAuthUserModelWithRole<RBAuthBaseRoles> | null) => boolean
+  debug?: boolean
 }> = ({
   children,
   authApi,
@@ -20,18 +21,22 @@ export const Auth: React.FC<{
   appApis = {},
   monitorUserChanges = null,
   isAuthLogic = (user) => !!(user && user.role && user.role !== 'public'),
+  debug = false,
 }) => {
+  const [isAuth, setIsAuth] = React.useState(false)
   const [reloading, setReloading] = React.useState(true)
   const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles> | null>(null)
 
   const logic = new BaseAuthApiWrapper({ setReloading, setUser, authApi, onAuthExpired, appApis })
 
   useEffect(() => {
+    if (debug) console.log('ReactRBAuth::user changed')
+    if (isAuthLogic) setIsAuth(isAuthLogic(user))
     if (monitorUserChanges) monitorUserChanges(user)
   }, [user])
 
   const contextVal: RBAuthContextType = {
-    isAuth: isAuthLogic(user),
+    isAuth,
     reloading,
     logic,
     routes: { private: routes?.private || '/private', public: routes?.public || '/' },
