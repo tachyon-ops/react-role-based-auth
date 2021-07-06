@@ -11,7 +11,16 @@ export const Auth: React.FC<{
   onAuthExpired?: (e: RBAuthErrors) => void
   appApis?: Record<string, unknown>
   monitorUserChanges?: null | ((user: RBAuthUserModelWithRole<RBAuthBaseRoles> | null) => void)
-}> = ({ children, authApi, routes, onAuthExpired, appApis = {}, monitorUserChanges = null }) => {
+  isAuthLogic?: (user: RBAuthUserModelWithRole<RBAuthBaseRoles> | null) => boolean
+}> = ({
+  children,
+  authApi,
+  routes,
+  onAuthExpired,
+  appApis = {},
+  monitorUserChanges = null,
+  isAuthLogic = (user) => !!(user && user.role && user.role !== 'public'),
+}) => {
   const [reloading, setReloading] = React.useState(true)
   const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles> | null>(null)
 
@@ -22,7 +31,7 @@ export const Auth: React.FC<{
   }, [user])
 
   const contextVal: RBAuthContextType = {
-    isAuth: !!(user && user.role && user.role !== 'public'),
+    isAuth: isAuthLogic(user),
     reloading,
     logic,
     routes: { private: routes?.private || '/private', public: routes?.public || '/' },
