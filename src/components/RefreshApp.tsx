@@ -7,7 +7,7 @@ class FirstRun {
 }
 
 export const RefreshApp: React.FC<{
-  locationPathName: string
+  locationPathName?: string
   AuthReloadingComp: React.FC
   AuthLoadingComp?: React.FC
   authCallbackRoute?: string
@@ -30,21 +30,24 @@ export const RefreshApp: React.FC<{
     else setIsReloading(false)
   }, [auth.reloading, AuthLoadingComp])
 
+  const firstRun = async () => {
+    let silentSwallowFunc = () => {}
+    const onRefreshFinishedHandler = () => {
+      if (debug) console.log('Finished refreshing')
+      if (onRefreshFinished) onRefreshFinished()
+    }
+    if (debug) silentSwallowFunc = console.log
+    await auth.logic
+      .silent()
+      .then(silentSwallowFunc)
+      .catch(silentSwallowFunc)
+      .finally(onRefreshFinishedHandler)
+  }
+
   useEffect(() => {
     if (!FirstRun.done && locationPathName !== authCallbackRoute) {
       FirstRun.done = true
-
-      let silentSwallowFunc = () => {}
-      const onRefreshFinishedHandler = () => {
-        if (debug) console.log('Finished refreshing')
-        if (onRefreshFinished) onRefreshFinished()
-      }
-      if (debug) silentSwallowFunc = console.log
-      auth.logic
-        .silent()
-        .then(silentSwallowFunc)
-        .catch(silentSwallowFunc)
-        .finally(onRefreshFinishedHandler)
+      firstRun()
     }
   }, [])
 

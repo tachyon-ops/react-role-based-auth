@@ -1,27 +1,27 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { Card } from 'react-native-elements';
-import { AuthContext, ApiAccessBuilder } from 'react-rb-auth';
+import React, { useContext, useState } from 'react'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import { Card } from 'react-native-elements'
+import { AuthContext, ApiAccessBuilder } from 'react-rb-auth'
 
-import { AppButton } from '../../ui/AppButton';
-import { Screen } from '../../ui/Screen';
-import { StyleContext } from '../../services/StyleService';
-import { AppAuthContext } from '../../services/AppAuthContext';
-import { Utils } from '../../services/Utils';
+import { AppButton } from '../../ui/AppButton'
+import { Screen } from '../../ui/Screen'
+import { StyleContext } from '../../services/StyleService'
+import { AppAuthContext } from '../../services/AppAuthContext'
+import { Utils } from '../../services/Utils'
 
-const PIC_SIZE = 100;
+const PIC_SIZE = 100
 
 type RetrievedUserType = {
-  nickname: string;
-  date: Date;
-  lastFetched: Date;
-};
+  nickname: string
+  date: Date
+  lastFetched: Date
+}
 
 export const DashboardScreen: React.FC = () => {
-  const style = useContext(StyleContext);
-  const authContext = useContext(AuthContext);
-  const nav = useNavigation();
+  const style = useContext(StyleContext)
+  const authContext = useContext(AuthContext)
+  const nav = useNavigation()
 
   const styles = StyleSheet.create({
     container: {
@@ -29,12 +29,12 @@ export const DashboardScreen: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'center',
     },
-  });
+  })
 
-  const logout = () => authContext.logic.logout();
-  const goToCredits = () => nav.navigate('Credits');
+  const logout = () => authContext.logic.logout()
+  const goToCredits = () => nav.navigate('Credits')
 
-  const [retrievedUser, setRetrievedUser] = useState<RetrievedUserType>(null);
+  const [retrievedUser, setRetrievedUser] = useState<RetrievedUserType>(null)
 
   return (
     <Screen>
@@ -45,15 +45,15 @@ export const DashboardScreen: React.FC = () => {
             {({ logic: { refresh, apis }, user }) => {
               const onAccessTokenHandle = new ApiAccessBuilder(apis.external.getUser)
                 .withSuccess((res) => {
-                  console.log('success: ', res);
+                  console.log('success: ', res)
                   setRetrievedUser({
-                    nickname: ((res as unknown) as RetrievedUserType).nickname,
+                    nickname: (res as unknown as RetrievedUserType).nickname,
                     date: new Date(),
                     lastFetched: retrievedUser?.date || null,
-                  });
+                  })
                 })
                 .withFailure((error) => console.log('failure: ', error))
-                .build(refresh);
+                .build(refresh)
 
               return (
                 <Card
@@ -85,9 +85,9 @@ export const DashboardScreen: React.FC = () => {
                       </Text>
                     )}
                   </View>
-                  <AppButton label="Check AccessToken" onPress={onAccessTokenHandle} />
-                  <AppButton label="Logout" onPress={logout} />
-                  <AppButton label="Credits" onPress={goToCredits} />
+                  <AppButton label='Check AccessToken' onPress={onAccessTokenHandle} />
+                  <AppButton label='Logout' onPress={logout} />
+                  <AppButton label='Credits' onPress={goToCredits} />
                   {retrievedUser && (
                     <View>
                       <Text>Got user: </Text>
@@ -103,11 +103,11 @@ export const DashboardScreen: React.FC = () => {
                     </View>
                   )}
                 </Card>
-              );
+              )
             }}
           </AppAuthContext.Consumer>
         </View>
       </View>
     </Screen>
-  );
-};
+  )
+}

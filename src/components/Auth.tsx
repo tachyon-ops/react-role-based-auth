@@ -15,7 +15,7 @@ export const Auth: React.FC<{
   const [reloading, setReloading] = React.useState(true)
   const [user, setUser] = React.useState<RBAuthUserModelWithRole<RBAuthBaseRoles> | null>(null)
 
-  const logic = new BaseAuthApiWrapper(setReloading, setUser, authApi, onAuthExpired, appApis)
+  const logic = new BaseAuthApiWrapper({ setReloading, setUser, authApi, onAuthExpired, appApis })
 
   useEffect(() => {
     if (monitorUserChanges) monitorUserChanges(user)

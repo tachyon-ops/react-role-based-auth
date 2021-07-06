@@ -32,12 +32,17 @@ type ProcessesType<TLoging, LogOutType, SignUpType, SilentAuthType, HandleAuthTy
   }
 
 abstract class UserReloader {
-  constructor(public setReloading: SetterType, public setUser: SetterType) {}
+  public setReloading: SetterType
+  public setUser: SetterType
+  constructor(setReloading: SetterType, setUser: SetterType) {
+    this.setReloading = setReloading
+    this.setUser = setUser
+  }
 }
 
 type RefreshTokenEndLifeCallbackType = (rbAuthErros: RBAuthErrors, error?: Error) => void
 
-const dummyFunction = (arg: unknown) => new Promise<unknown>((r) => r(arg))
+const dummyFunction = (arg: unknown) => new Promise<unknown>((resolve) => resolve(arg))
 
 export class BaseAuthApiWrapper<
     LoginType extends KnownAuthProcess<{
@@ -76,30 +81,34 @@ export class BaseAuthApiWrapper<
   private errorCallback: RefreshTokenEndLifeCallbackType = () => null
   private appApis: Record<string, unknown> = {}
 
-  constructor(
-    setReloading: SetterType,
-    setUser: SetterType,
-    processes: ProcessesType<
-      LoginType,
-      LogOutType,
-      SignUpType,
-      SilentType,
-      HandleType,
-      RefreshType
-    >,
-    refreshTokenEndLifeCallback?: RefreshTokenEndLifeCallbackType,
+  private reloadFlag: boolean = true
+
+  constructor({
+    setReloading,
+    setUser,
+    authApi,
+    onAuthExpired,
+    appApis,
+    reloadFlag,
+  }: {
+    setReloading: SetterType
+    setUser: SetterType
+    authApi: ProcessesType<LoginType, LogOutType, SignUpType, SilentType, HandleType, RefreshType>
+    onAuthExpired?: RefreshTokenEndLifeCallbackType
     appApis?: AppApis
-  ) {
+    reloadFlag?: boolean
+  }) {
     super(setReloading, setUser)
-    if (refreshTokenEndLifeCallback) this.errorCallback = refreshTokenEndLifeCallback
+    if (onAuthExpired) this.errorCallback = onAuthExpired
     if (appApis) this.appApis = this.embedWrapperLogicIntoApis(appApis)
-    if (!processes) return
-    if (processes.login) this.loginLogic = processes.login
-    if (processes.logout) this.logoutLogic = processes.logout
-    if (processes.signup) this.signupLogic = processes.signup
-    if (processes.handle) this.handleLogic = processes.handle
-    if (processes.silent) this.silentLogic = processes.silent
-    if (processes.refresh) this.refreshLogic = processes.refresh
+    if (reloadFlag) this.reloadFlag = reloadFlag
+    if (!authApi) return
+    if (authApi.login) this.loginLogic = authApi.login
+    if (authApi.logout) this.logoutLogic = authApi.logout
+    if (authApi.signup) this.signupLogic = authApi.signup
+    if (authApi.handle) this.handleLogic = authApi.handle
+    if (authApi.silent) this.silentLogic = authApi.silent
+    if (authApi.refresh) this.refreshLogic = authApi.refresh
   }
 
   public get apis(): Record<string, unknown> {
@@ -112,7 +121,7 @@ export class BaseAuthApiWrapper<
   // simple signup
   signup: UnknownAuthProcess = (...args: any) => this.signupLogic(...args)
   // custom logic
-  refresh: RefreshProcessResponse = async (f: boolean) => this.runRefresh(this.refreshLogic)(f)
+  refresh: RefreshProcessResponse = async () => this.runRefresh(this.refreshLogic)()
   logout: UnknownAuthProcess = async (...args: any) =>
     this.wrap(async () => {
       const res = await this.logoutLogic(...args)
@@ -150,12 +159,12 @@ export class BaseAuthApiWrapper<
         return res
       })
 
-  private runRefresh = (logic: RefreshProcessResponse) => async (flag: boolean) =>
+  private runRefresh = (logic: RefreshProcessResponse) => async () =>
     this.wrap(async () => {
       const res = await logic()
       if (res.refreshToken) await TokenUtil.setTokens(res)
       return res
-    }, flag)
+    })
 
   // this means the access token got krazy!
   private accessTokenError = RBAuthErrors.UNAUTHORIZED
@@ -173,8 +182,8 @@ export class BaseAuthApiWrapper<
         .build(this.refresh as any)
     }
 
-  private wrap = async <T>(logic: () => T, flag = true) => {
-    if (flag) this.setReloading(true)
+  private wrap = async <T>(logic: () => T) => {
+    if (this.reloadFlag) this.setReloading(true)
     try {
       return await logic()
     } catch (e) {
@@ -190,30 +199,8 @@ export class BaseAuthApiWrapper<
         this.errorCallback(RBAuthErrors.UNKNOWN, e)
       throw e
     } finally {
-      if (flag) this.setReloading(false)
+      if (this.reloadFlag) this.setReloading(false)
     }
-    // try {
-    //   return logic();
-    // } catch (error) {
-    //   if (error.message === AuthErrors.REFRESH_TOKEN_NOT_PRESENT) {
-    //     // swallow
-    //   }
-    //   //  else if (error.message === AuthErrors.REFRESH_TOKEN_REVOKED) {
-    //   //   this.errorCallback(AuthErrors.REFRESH_TOKEN_REVOKED);
-    //   // } else if (
-    //   //   error.mesage === AuthErrors.UNAUTHORIZED ||
-    //   //   error.mesage === 'JSON Parse error: Unexpected identifier "Unauthorized"'
-    //   // ) {
-    //   //   this.errorCallback(AuthErrors.UNAUTHORIZED);
-    //   // } else if (error.message === AuthErrors.TOO_MANY_REQUESTS) {
-    //   //   this.errorCallback(AuthErrors.TOO_MANY_REQUESTS);
-    //   // }
-    //   console.log('wrap catch: ', error, error.message);
-    //   // throw error;
-    //   return null;
-    // } finally {
-    //   if (flag) this.setReloading(false);
-    // }
   }
 
   private authenticate = async (
