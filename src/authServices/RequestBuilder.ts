@@ -95,18 +95,18 @@ export class RequestBuilder {
   }
 
   async build<T>(): Promise<T> {
+    let result: unknown
     const res = await this.request()
     const contentType = res.headers.get('content-type')
     const success = res.ok
-    if (contentType && contentType.indexOf('application/json') !== -1) {
-      return await res.json()
-    } else {
-      const error = (await res.text()) as string
-      if (!success) {
-        if (this.debug) console.log(error)
-        if (this.errorHandling) this.errorHandling(error)
-      }
-      return error as unknown as T
+    if (contentType && contentType.indexOf('application/json') !== -1) result = await res.json()
+    else result = (await res.text()) as unknown
+
+    if (!success) {
+      if (this.debug) console.log(result)
+      if (this.errorHandling) this.errorHandling(result)
     }
+
+    return result as T
   }
 }
