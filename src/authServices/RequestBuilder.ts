@@ -102,11 +102,10 @@ export class RequestBuilder {
     if (contentType && contentType.indexOf('application/json') !== -1) result = await res.json()
     else result = (await res.text()) as unknown
 
-    if (!success) {
-      if (this.debug) console.log(result)
-      if (this.errorHandling) this.errorHandling(result)
-    }
+    if (this.debug)
+      console.log('request yielded: ', result, ' was it successfull? ', success ? 'yes' : 'no')
 
+    if (!success && this.errorHandling) this.errorHandling(result)
     return result as T
   }
 }
