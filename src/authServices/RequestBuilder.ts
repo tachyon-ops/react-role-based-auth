@@ -19,7 +19,7 @@ export enum HTTPMethod {
   TRACE = 'TRACE',
 }
 
-type ErrorHandlerType<T> = (error: T) => void
+type ErrorHandlerType = <Response>(error: Response, status: number) => void
 
 export class RequestBuilder {
   private route = ''
@@ -27,7 +27,7 @@ export class RequestBuilder {
   private headers: Headers = new Headers()
   private method: HTTPMethod = HTTPMethod.GET
   private mode: RequestMode | null = null
-  private errorHandling: ErrorHandlerType<any> | null = null
+  private errorHandling: ErrorHandlerType | null = null
   private timeout: number = DEFAULT_TIMEOUT
 
   constructor(route: string, private debug = false) {
@@ -40,7 +40,7 @@ export class RequestBuilder {
     return this
   }
 
-  withErrorHandling<T>(callback: ErrorHandlerType<T>) {
+  withErrorHandling(callback: ErrorHandlerType) {
     this.errorHandling = callback
     return this
   }
@@ -95,17 +95,18 @@ export class RequestBuilder {
   }
 
   async build<T>(): Promise<T> {
-    let result: unknown
+    let result: T
     const res = await this.request()
     const contentType = res.headers.get('content-type')
     const success = res.ok
+    const status = res.status
     if (contentType && contentType.indexOf('application/json') !== -1) result = await res.json()
-    else result = (await res.text()) as unknown
+    else result = (await res.text()) as unknown as T
 
     if (this.debug)
       console.log('request yielded: ', result, ' was it successfull? ', success ? 'yes' : 'no')
 
-    if (!success && this.errorHandling) this.errorHandling(result)
+    if (!success && this.errorHandling) this.errorHandling(result, status)
     return result as T
   }
 }
