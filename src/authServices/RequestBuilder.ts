@@ -19,15 +19,15 @@ export enum HTTPMethod {
   TRACE = 'TRACE',
 }
 
-type ErrorHandlerType<T> = (error: T, status: number) => void
+type ErrorHandlerType<T = any> = (error: T, status: number) => void
 
-export class RequestBuilder<T extends {}> {
+export class RequestBuilder {
   private route = ''
   private body: Record<string, unknown> | null = null
   private headers: Headers = new Headers()
   private method: HTTPMethod = HTTPMethod.GET
   private mode: RequestMode | null = null
-  private errorHandling: ErrorHandlerType<T> | null = null
+  private errorHandling: ErrorHandlerType<any> | null = null
   private timeout: number = DEFAULT_TIMEOUT
 
   constructor(route: string, private debug = false) {
@@ -40,7 +40,7 @@ export class RequestBuilder<T extends {}> {
     return this
   }
 
-  withErrorHandling(callback: ErrorHandlerType<T>) {
+  withErrorHandling<T>(callback: ErrorHandlerType<T>) {
     this.errorHandling = callback
     return this
   }
@@ -94,7 +94,7 @@ export class RequestBuilder<T extends {}> {
     return fetchWithTimeout(this.route, opts, this.timeout)
   }
 
-  async build(): Promise<T> {
+  async build<T>(): Promise<T> {
     let result: T
     const res = await this.request()
     const contentType = res.headers.get('content-type')
