@@ -19,7 +19,7 @@ export enum HTTPMethod {
   TRACE = 'TRACE',
 }
 
-type ErrorHandlerType<T> = (error: T) => void
+type ErrorHandlerType<T = any> = (error: T, status: number) => void
 
 export class RequestBuilder {
   private route = ''
@@ -95,18 +95,18 @@ export class RequestBuilder {
   }
 
   async build<T>(): Promise<T> {
-    let result: unknown
+    let result: T
     const res = await this.request()
     const contentType = res.headers.get('content-type')
     const success = res.ok
+    const status = res.status
     if (contentType && contentType.indexOf('application/json') !== -1) result = await res.json()
-    else result = (await res.text()) as unknown
+    else result = (await res.text()) as unknown as T
 
-    if (!success) {
-      if (this.debug) console.log(result)
-      if (this.errorHandling) this.errorHandling(result)
-    }
+    if (this.debug)
+      console.log('request yielded: ', result, ' was it successfull? ', success ? 'yes' : 'no')
 
+    if (!success && this.errorHandling) this.errorHandling(result, status)
     return result as T
   }
 }
