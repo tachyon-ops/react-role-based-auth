@@ -6,6 +6,7 @@ import { AuthContext, RBAuthInitialUser } from '../roles-based-auth/context';
 import { PartialAuthApi, RBAuthUserModelWithRole, RBAuthBaseRoles, RBAuthContextType } from '..';
 
 export const Auth: React.FC<{
+  children: React.ReactNode;
   authApi: PartialAuthApi;
   routes?: { private: string; public: string };
   onAuthExpired?: (e: RBAuthErrors) => void;
