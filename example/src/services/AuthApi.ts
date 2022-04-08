@@ -71,7 +71,7 @@ export class AuthApi implements PartialAuthApi {
       }
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.log('authWrapper catch: ', error);
+      console.log('[authWrapper] catch: ', error);
     }
 
     return {

@@ -20,7 +20,14 @@ export const Auth: React.FC<{
   onAuthExpired,
   appApis = {},
   monitorUserChanges = null,
-  isAuthLogic = (user) => !!(user && user.role && user.role !== 'public'),
+  isAuthLogic = (user) => {
+    const result = !!(user && user.role && user.role !== 'public');
+    console.log(
+      'Using default user logic for user with role "public" to be not authenticated. User role: ',
+      user?.role
+    );
+    return result;
+  },
   debug = false,
 }) => {
   const [isAuth, setIsAuth] = React.useState(false);

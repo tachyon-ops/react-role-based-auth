@@ -10,10 +10,10 @@ export const SecureScreen: React.FC<{
   const auth = useContext(AuthContext);
 
   if (!auth.isAuth) {
-    if (onSecureScreen) onSecureScreen();
-    else if (NotAllowed) return <>{NotAllowed}</>;
+    if (onSecureScreen) setTimeout(onSecureScreen); // on first CPU availability
+    else if (NotAllowed) return <React.Fragment>{NotAllowed}</React.Fragment>;
     // Show nothing
-    return <></>;
+    return <React.Fragment />;
   }
-  return <>{Allowed}</>;
+  return <React.Fragment>{Allowed}</React.Fragment>;
 };
