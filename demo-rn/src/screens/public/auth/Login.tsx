@@ -8,7 +8,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Button, Input } from 'react-native-elements';
+import { Card, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { AppButton } from '../../../ui/AppButton';
@@ -45,7 +45,7 @@ export const LoginScreen: React.FC = () => {
 
   const signup = () => nav.navigate('Signup');
 
-  const onSuccess = (res) => {
+  const onSuccess = () => {
     // console.log('onSuccess res', res);
     // nav.navigate('Admin/Dashboard');
   };
@@ -59,41 +59,41 @@ export const LoginScreen: React.FC = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <KeyboardAvoidingView
-            behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
           >
             <Card
-              title="Login"
+              title='Login'
               titleStyle={style.typography.title}
               containerStyle={{ paddingVertical: 20, minWidth: 350 }}
             >
               <Input
                 autoFocus
-                keyboardType="email-address"
+                keyboardType='email-address'
                 ref={emailRef}
                 value={email}
-                label="Email"
-                placeholder="Email address..."
+                label='Email'
+                placeholder='Email address...'
                 onChangeText={onEmailChange}
-                returnKeyType="next"
+                returnKeyType='next'
                 // onEndEditing={next}
                 onSubmitEditing={next}
-                leftIcon={<Icon name="email-outline" size={24} color="grey" />}
+                leftIcon={<Icon name='email-outline' size={24} color='grey' />}
               />
               <Input
                 ref={passwordRef}
                 value={password}
-                label="Password"
+                label='Password'
                 secureTextEntry
-                placeholder="Password..."
+                placeholder='Password...'
                 onChangeText={onPasswordChange}
-                returnKeyType="send"
-                leftIcon={<Icon name="lock-outline" size={24} color="grey" />}
+                returnKeyType='send'
+                leftIcon={<Icon name='lock-outline' size={24} color='grey' />}
               />
 
-              <AppButton size={15} label="Login" onPress={login} />
+              <AppButton size={15} label='Login' onPress={login} />
               <Line />
-              <AppButton size={15} label="Sign up" onPress={signup} />
+              <AppButton size={15} label='Sign up' onPress={signup} />
             </Card>
           </KeyboardAvoidingView>
         </View>
