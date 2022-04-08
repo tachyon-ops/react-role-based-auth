@@ -1,7 +1,7 @@
 import React from 'react';
 import { Column } from './Column';
 import { Row } from './Row';
-import { ViewStyle, StyleProp, View } from 'react-native';
+import { ViewStyle } from 'react-native';
 
 type ArrayLengthMutationKeys = 'splice' | 'push' | 'pop' | 'shift' | 'unshift';
 type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> = Pick<

@@ -8,7 +8,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Button, Input } from 'react-native-elements';
+import { Card, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { AppButton } from '../../../ui/AppButton';
@@ -68,11 +68,11 @@ export const SignupScreen: React.FC = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <KeyboardAvoidingView
-            behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
           >
             <Card
-              title="Login"
+              title='Login'
               titleStyle={style.typography.title}
               containerStyle={{ paddingVertical: 20, minWidth: 350 }}
             >
@@ -80,39 +80,39 @@ export const SignupScreen: React.FC = () => {
                 autoFocus
                 ref={nameRef}
                 value={name}
-                label={'Name'}
-                placeholder="Name..."
+                label='Name'
+                placeholder='Name...'
                 onChangeText={setName}
-                returnKeyType="next"
+                returnKeyType='next'
                 onSubmitEditing={endName}
-                leftIcon={<Icon name="account-outline" size={24} color="grey" />}
+                leftIcon={<Icon name='account-outline' size={24} color='grey' />}
               />
               <Input
-                keyboardType="email-address"
+                keyboardType='email-address'
                 ref={emailRef}
                 value={email}
-                label="Email"
-                placeholder="Email address..."
+                label='Email'
+                placeholder='Email address...'
                 onChangeText={setEmail}
-                returnKeyType="next"
+                returnKeyType='next'
                 // onEndEditing={next}
                 onSubmitEditing={next}
-                leftIcon={<Icon name="email-outline" size={24} color="grey" />}
+                leftIcon={<Icon name='email-outline' size={24} color='grey' />}
               />
               <Input
                 ref={passwordRef}
                 value={password}
-                label="Password"
+                label='Password'
                 secureTextEntry
-                placeholder="Password..."
+                placeholder='Password...'
                 onChangeText={setPassword}
-                returnKeyType="send"
-                leftIcon={<Icon name="lock-outline" size={24} color="grey" />}
+                returnKeyType='send'
+                leftIcon={<Icon name='lock-outline' size={24} color='grey' />}
               />
 
-              <AppButton size={15} label="Sign up" onPress={signup} />
+              <AppButton size={15} label='Sign up' onPress={signup} />
               <Line />
-              <AppButton size={15} label="Login" onPress={login} />
+              <AppButton size={15} label='Login' onPress={login} />
             </Card>
           </KeyboardAvoidingView>
         </View>

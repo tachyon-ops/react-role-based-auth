@@ -1,21 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react';
 
-import { RBAuthRedirect } from '..'
-import { AuthContext } from '../roles-based-auth/context'
+import { AuthContext } from '../roles-based-auth/context';
 
 export const SecureScreen: React.FC<{
-  Redirect: RBAuthRedirect
-  Allowed: React.FC
-  NotAllowed?: React.FC
-}> = ({ Redirect, Allowed, NotAllowed }) => (
-  <AuthContext.Consumer>
-    {(auth) => {
-      if (!auth.isAuth) {
-        if (NotAllowed) return <NotAllowed />
-        // TODO: set 'last route' in auth context if app needs to gracefully recover
-        return <Redirect to={auth.routes?.public || '/'} />
-      }
-      return <Allowed />
-    }}
-  </AuthContext.Consumer>
-)
+  Allowed: React.ReactNode | React.ReactNodeArray;
+  NotAllowed?: React.ReactNode | React.ReactNodeArray;
+  onSecureScreen?: () => void;
+}> = ({ Allowed, NotAllowed, onSecureScreen }) => {
+  const auth = useContext(AuthContext);
+
+  if (!auth.isAuth) {
+    if (onSecureScreen) setTimeout(onSecureScreen); // on first CPU availability
+    else if (NotAllowed) return <React.Fragment>{NotAllowed}</React.Fragment>;
+    // Show nothing
+    return <React.Fragment />;
+  }
+  return <React.Fragment>{Allowed}</React.Fragment>;
+};

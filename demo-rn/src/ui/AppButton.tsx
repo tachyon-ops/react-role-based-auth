@@ -6,7 +6,7 @@ export const AppButton: React.FC<{
   onPress: VoidFunction;
   label: string;
   size?: number;
-}> = ({ onPress, label, size = 20 }) => {
+}> = ({ onPress, label }) => {
   const style = useContext(StyleContext);
   const styles = StyleSheet.create({
     container: {

@@ -47,7 +47,13 @@ export const rules: RBAuthRulesInterface<AppRole> = {
       'posts:delete',
     ],
     dynamic: {
-      'users:delete': ({ authUser, user }: { authUser: IndexableUser; user: IndexableUser }): boolean => {
+      'users:delete': ({
+        authUser,
+        user,
+      }: {
+        authUser: IndexableUser;
+        user: IndexableUser;
+      }): boolean => {
         if (authUser.id === user.id) return false;
         return true;
       },

@@ -1,9 +1,9 @@
-import { AuthContext, RBAuthReactContext } from 'react-rb-auth'
+import { AuthContext, RBAuthReactContext } from 'react-rb-auth';
 
-import { LoginType, SignupType, HandleType, SilentType, LogoutType, RefreshType } from './AuthApi'
-import { UserModel } from '../models/user'
-import { rules } from '../models/rules'
-import { GlobalAppApi } from './ExternalApi'
+import { LoginType, SignupType, HandleType, SilentType, LogoutType, RefreshType } from './AuthApi';
+import { UserModel } from '../models/user';
+import { rules } from '../models/rules';
+import { GlobalAppApi } from './ExternalApi';
 
 export const AppAuthContext = AuthContext as RBAuthReactContext<
   UserModel,
@@ -15,4 +15,4 @@ export const AppAuthContext = AuthContext as RBAuthReactContext<
   SilentType,
   RefreshType,
   typeof GlobalAppApi
->
+>;

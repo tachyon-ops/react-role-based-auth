@@ -1,13 +1,11 @@
 import React, { useContext } from 'react';
-import { View, Text, ScrollView, Linking, Image, ViewStyle } from 'react-native';
+import { View, Text, ScrollView, Linking, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Card, Button } from 'react-native-elements';
 
 import { AppButton } from '../../ui/AppButton';
 import { Screen } from '../../ui/Screen';
 import { StyleContext } from '../../services/StyleService';
-import { Column } from '../../ui/table/Column';
-import { Row } from '../../ui/table/Row';
 import { TableUIType, Table } from '../../ui/table/Table';
 
 const images = [
@@ -39,12 +37,6 @@ export const HomeScreen: React.FC = () => {
   const goToLogin = () => nav.navigate('Login');
   const goToCredits = () => nav.navigate('Credits');
 
-  const getBorder = (color: string = 'red'): ViewStyle => ({
-    borderColor: color,
-    borderWidth: 1,
-    borderStyle: 'solid',
-  });
-
   const tableData: TableUIType<3, 3> = {
     attributes: {
       weigth: [3, 0, 0],
@@ -53,10 +45,15 @@ export const HomeScreen: React.FC = () => {
       rowStyle: { justifyContent: 'center' },
     },
     content: [
-      [<Text>Text 1</Text>, <Text>Text 2</Text>, <Text>Text 3</Text>],
-      [<Text>Text 1</Text>, <Text>Text 2 bla blalblabl </Text>, <Text>Text 3</Text>],
+      [<Text key={1}>Text 1</Text>, <Text key={2}>Text 2</Text>, <Text key={3}>Text 3</Text>],
+      [
+        <Text key={1}>Text 1</Text>,
+        <Text key={2}>Text 2 bla blalblabl </Text>,
+        <Text key={3}>Text 3</Text>,
+      ],
       [
         <View
+          key={1}
           style={{
             borderLeftColor: 'red',
             borderLeftWidth: 20,
@@ -66,8 +63,8 @@ export const HomeScreen: React.FC = () => {
         >
           <Text>Text 1</Text>
         </View>,
-        <Text>Text 2 bla blalblabl </Text>,
-        <Text>Text 3</Text>,
+        <Text key={2}>Text 2 bla blalblabl </Text>,
+        <Text key={3}>Text 3</Text>,
       ],
     ],
   };
@@ -100,15 +97,15 @@ export const HomeScreen: React.FC = () => {
                 <Text style={{ marginBottom: 10 }}>Photo by {name}.</Text>
                 <Button
                   buttonStyle={{ backgroundColor: style.color.secondary }}
-                  title="VIEW NOW"
+                  title='VIEW NOW'
                   onPress={() => Linking.openURL(url)}
                 />
               </Card>
             ))}
           </ScrollView>
         </View>
-        <AppButton label="Login" onPress={goToLogin} />
-        <AppButton label="Credits" onPress={goToCredits} />
+        <AppButton label='Login' onPress={goToLogin} />
+        <AppButton label='Credits' onPress={goToCredits} />
       </View>
     </Screen>
   );

@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
-import { createContext } from 'react'
+import { createContext } from 'react';
 import {
   RBAuthUserModelWithRole,
   RBAuthBaseRoles,
   RBAuthTokensType,
   RBAuthContextType,
   RBAuthReactContext,
-} from '..'
+} from '..';
 
 export const RBAuthInitialUser: RBAuthUserModelWithRole<RBAuthBaseRoles> = {
   role: 'public',
-}
+};
 export const RBAuthInitialToken: RBAuthTokensType = {
   accessToken: '',
   refreshToken: '',
@@ -18,7 +18,7 @@ export const RBAuthInitialToken: RBAuthTokensType = {
   tokenType: '',
   expiresIn: '',
   scope: '',
-}
+};
 
 export const AuthContext = createContext<RBAuthContextType>({
   // to check if authenticated or not
@@ -55,4 +55,4 @@ export const AuthContext = createContext<RBAuthContextType>({
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}) as RBAuthReactContext<any, any, any, any, any, any, any, any, any>
+}) as RBAuthReactContext<any, any, any, any, any, any, any, any, any>;

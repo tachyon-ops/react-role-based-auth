@@ -29,19 +29,19 @@ export const Navigation: React.FC = () => {
     <AuthContext.Consumer>
       {(context) => (
         <NavigationContainer theme={theme}>
-          <Stack.Navigator headerMode="none">
+          <Stack.Navigator headerMode='none'>
             {!context.isAuth ? (
               <>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Signup" component={SignupScreen} />
+                <Stack.Screen name='Home' component={HomeScreen} />
+                <Stack.Screen name='Login' component={LoginScreen} />
+                <Stack.Screen name='Signup' component={SignupScreen} />
               </>
             ) : (
               <>
-                <Stack.Screen name="Admin/Dashboard" component={DashboardScreen} />
+                <Stack.Screen name='Admin/Dashboard' component={DashboardScreen} />
               </>
             )}
-            <Stack.Screen name="Credits" component={CreditsScreen} />
+            <Stack.Screen name='Credits' component={CreditsScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       )}

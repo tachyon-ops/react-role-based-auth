@@ -1,12 +1,12 @@
-import { RBAuthErrors } from '../rb-auth-errors'
+import { RBAuthErrors } from '../rb-auth-errors';
 
-const RECUR_LEVEL = 1
+const RECUR_LEVEL = 1;
 
-type RefreshType = (reloadFlag?: boolean) => Promise<Response>
-type RequestType = <T>() => Promise<T>
+type RefreshType = (reloadFlag?: boolean) => Promise<Response>;
+type RequestType = <T>() => Promise<T>;
 
-type OnSuccessType = <T>(arg: T) => void
-type OnFailureType = (error: RBAuthErrors) => void
+type OnSuccessType = <T>(arg: T) => void;
+type OnFailureType = (error: RBAuthErrors) => void;
 
 class RequestWrapper {
   private static recursion = async (
@@ -21,13 +21,13 @@ class RequestWrapper {
     // console.log('RequestWrapper::recursion');
     try {
       // console.log('RequestWrapper::recursion will request');
-      await req()
+      await req();
       // console.log('RequestWrapper::recursion has request');
     } catch (e) {
-      if (e.message === accessTokenError && recursion >= 1) {
+      if ((e as Error).message === accessTokenError && recursion >= 1) {
         try {
           // refresh
-          await refresh()
+          await refresh();
           // then
           return RequestWrapper.recursion(
             refresh,
@@ -37,17 +37,17 @@ class RequestWrapper {
             recursion - 1,
             accessTokenError,
             refresTokenError
-          )
+          );
         } catch (error) {
-          onFailure(RBAuthErrors.REFRESH_TOKEN_REVOKED)
-          throw new Error(RBAuthErrors.REFRESH_TOKEN_REVOKED)
+          onFailure(RBAuthErrors.REFRESH_TOKEN_REVOKED);
+          throw new Error(RBAuthErrors.REFRESH_TOKEN_REVOKED);
         }
       } else {
-        onFailure(e)
+        onFailure(e as RBAuthErrors);
       }
-      throw e
+      throw e;
     }
-  }
+  };
 
   /**
    * RequestWrapper::handle()
@@ -77,45 +77,45 @@ class RequestWrapper {
         recursion,
         accessTokenError,
         refresTokenError
-      )
+      );
   }
 }
 
 export class ApiAccessBuilder {
-  private success: OnSuccessType = () => null
-  private failure: OnFailureType = () => null
-  private recursions: number = RECUR_LEVEL
-  private accessTokenError: RBAuthErrors = RBAuthErrors.INVALID_GRANT
-  private refreshTokenError: RBAuthErrors = RBAuthErrors.REFRESH_TOKEN_REVOKED
-  private logic: <T>() => Promise<T>
+  private success: OnSuccessType = () => null;
+  private failure: OnFailureType = () => null;
+  private recursions: number = RECUR_LEVEL;
+  private accessTokenError: RBAuthErrors = RBAuthErrors.INVALID_GRANT;
+  private refreshTokenError: RBAuthErrors = RBAuthErrors.REFRESH_TOKEN_REVOKED;
+  private logic: <T>() => Promise<T>;
 
   constructor(logic: <T>() => Promise<T>) {
-    this.logic = logic
+    this.logic = logic;
   }
 
   withAccessTokenError(accessTokenError: RBAuthErrors) {
-    this.accessTokenError = accessTokenError
-    return this
+    this.accessTokenError = accessTokenError;
+    return this;
   }
 
   withRefreshTokenError(refreshTokenError: RBAuthErrors) {
-    this.refreshTokenError = refreshTokenError
-    return this
+    this.refreshTokenError = refreshTokenError;
+    return this;
   }
 
   withSuccess(success: OnSuccessType) {
-    this.success = success
-    return this
+    this.success = success;
+    return this;
   }
 
   withFailure(failure: OnFailureType) {
-    this.failure = failure
-    return this
+    this.failure = failure;
+    return this;
   }
 
   withCustomRecursions(recursions: number) {
-    this.recursions = recursions
-    return this
+    this.recursions = recursions;
+    return this;
   }
 
   build(refresh: RefreshType) {
@@ -126,6 +126,6 @@ export class ApiAccessBuilder {
       this.recursions,
       this.accessTokenError,
       this.refreshTokenError
-    )(refresh)
+    )(refresh);
   }
 }

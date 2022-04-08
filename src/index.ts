@@ -1,19 +1,19 @@
-import React from 'react'
+import React from 'react';
 // components
-import { Auth } from './components/Auth'
-import { AuthCallback } from './components/AuthCallback'
-import { RefreshApp } from './components/RefreshApp'
-import { SecureScreen } from './components/SecureScreen'
+import { Auth } from './components/Auth';
+import { AuthCallback } from './components/AuthCallback';
+import { RefreshApp } from './components/RefreshApp';
+import { SecureScreen } from './components/SecureScreen';
 // services
-import { HeadersBuilder } from './authServices/HeadersUtil'
+import { HeadersBuilder } from './authServices/HeadersUtil';
 // roles
-import { AuthContext, RBAuthInitialToken } from './roles-based-auth/context'
-import { TokenUtil } from './authServices/TokenUtilities'
-import { RequestBuilder, HTTPMethod } from './authServices/RequestBuilder'
-import { ApiAccessBuilder } from './authServices/RequestWrapper'
-import { BaseAuthApiWrapper } from './authServices/BaseAuthApiWrapper'
-import { Can } from './components/Can'
-import { RBAuthErrors } from './rb-auth-errors'
+import { AuthContext, RBAuthInitialToken } from './roles-based-auth/context';
+import { TokenUtil } from './authServices/TokenUtilities';
+import { RequestBuilder, HTTPMethod } from './authServices/RequestBuilder';
+import { ApiAccessBuilder } from './authServices/RequestWrapper';
+import { BaseAuthApiWrapper } from './authServices/BaseAuthApiWrapper';
+import { Can } from './components/Can';
+import { RBAuthErrors } from './rb-auth-errors';
 
 export {
   AuthContext,
@@ -31,7 +31,7 @@ export {
   BaseAuthApiWrapper,
   // Types
   RBAuthErrors,
-}
+};
 
 /**
  * TYPES
@@ -40,37 +40,51 @@ export {
 /**
  * SecureRoute Types
  */
-export type RBAuthRedirect = React.FC<{ to: string }>
+export type RBAuthRedirect = React.FC<{ to: string }>;
 
 /**
  * Rule Types
  */
-type RBAuthStaticRulesType = string[]
+type RBAuthStaticRulesType = string[];
 type RBAuthDynamicRulesType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: (...args: any) => boolean
-}
+  [key: string]: (...args: any) => boolean;
+};
 export type RBAuthRulesInterface<RoleType extends string> = {
   [key in RoleType]: {
-    static?: RBAuthStaticRulesType
-    dynamic?: RBAuthDynamicRulesType
-  }
-}
+    static?: RBAuthStaticRulesType;
+    dynamic?: RBAuthDynamicRulesType;
+  };
+};
 
 /**
  * User types
  */
-type RBAuthGenericRoles<T extends string> = 'admin' | 'public' | T
+type RBAuthGenericRoles<T extends string> = 'admin' | 'public' | T;
 export interface RBAuthUserModelWithRole<T extends string> {
-  role: RBAuthGenericRoles<T>
+  role: RBAuthGenericRoles<T>;
 }
+
+/**
+ * Roles Types
+ */
+export type RBAuthBaseRoles = 'admin' | 'public';
+
+export type RBAuthTokensType = {
+  accessToken: string;
+  refreshToken: string;
+  openIdToken: string;
+  expiresIn: string;
+  scope: string;
+  tokenType: string;
+};
 
 /**
  * Context types
  */
-export type KnownAuthProcess<R> = (...args: any) => Promise<R>
-export type UnknownAuthProcess = <R>(...args: any) => Promise<R | unknown | void>
-export type UnknownRefreshProcess = <R>(reloadFlag?: boolean) => Promise<R | unknown | void>
+export type KnownAuthProcess<R> = (...args: any) => Promise<R>;
+export type UnknownAuthProcess = <R>(...args: any) => Promise<R | unknown | void>;
+export type UnknownRefreshProcess = <R>(reloadFlag?: boolean) => Promise<R | unknown | void>;
 
 // Auth Context type
 export type RBAuthContextType<
@@ -84,46 +98,48 @@ export type RBAuthContextType<
   RefreshTokens = UnknownRefreshProcess,
   TApis = Record<string, unknown>
 > = {
-  isAuth: boolean // to check if authenticated or not
-  reloading: boolean
-  user: TUser // store all the user details
+  isAuth: boolean; // to check if authenticated or not
+  reloading: boolean;
+  user: TUser; // store all the user details
   logic: {
-    login: LoginType // to start the login process
-    signup: SignUpType
-    silent: SilentAuthType
-    handle: HandleAuthType // handle Auth0 login process
-    logout: LogOutType // logout the user
-    refresh: RefreshTokens
-    apis: TApis
-  }
+    login: LoginType; // to start the login process
+    signup: SignUpType;
+    silent: SilentAuthType;
+    handle: HandleAuthType; // handle Auth0 login process
+    logout: LogOutType; // logout the user
+    refresh: RefreshTokens;
+    apis: TApis;
+  };
   routes: {
-    public: string
-    private: string
-  }
-  rules?: TRules
-}
+    public: string;
+    private: string;
+  };
+  rules?: TRules;
+};
 
 /**
  * Types for Auth processing
  */
-export type SetterType = (variable: any) => void
+export type SetterType = (variable: any) => void;
 
 export interface AuthApiInterface {
   login: KnownAuthProcess<{
-    tokens: RBAuthTokensType
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>
-  }>
-  logout: UnknownAuthProcess
-  signup: UnknownAuthProcess
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
+  logout: UnknownAuthProcess;
+  signup: UnknownAuthProcess;
   handle: KnownAuthProcess<{
-    tokens: RBAuthTokensType
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>
-  }>
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
   silent: KnownAuthProcess<{
-    tokens: RBAuthTokensType
-    user: RBAuthUserModelWithRole<RBAuthBaseRoles>
-  }>
+    tokens: RBAuthTokensType;
+    user: RBAuthUserModelWithRole<RBAuthBaseRoles>;
+  }>;
 }
+
+export type PartialAuthApi = Partial<AuthApiInterface>;
 
 /**
  * RBAuthStorageType
@@ -132,30 +148,14 @@ export interface AuthApiInterface {
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures#Emulating_private_methods_with_closures
  */
 export type RBAuthStorageType = {
-  accessToken: string
-  refreshToken: string
-  openIdToken: string
-  tokenType: string
-  expiresIn: string
-  scope: string
-  setTokens: (tokens: RBAuthTokensType) => void
-}
-
-/**
- * Roles Types
- */
-export type RBAuthBaseRoles = 'admin' | 'public'
-
-export type PartialAuthApi = Partial<AuthApiInterface>
-
-export type RBAuthTokensType = {
-  accessToken: string
-  refreshToken: string
-  openIdToken: string
-  expiresIn: string
-  scope: string
-  tokenType: string
-}
+  accessToken: string;
+  refreshToken: string;
+  openIdToken: string;
+  tokenType: string;
+  expiresIn: string;
+  scope: string;
+  setTokens: (tokens: RBAuthTokensType) => void;
+};
 
 /**
  * React Context Type - for your AppAuthContext
@@ -184,4 +184,4 @@ export type RBAuthReactContext<
     // AppApis
     TApi
   >
->
+>;
