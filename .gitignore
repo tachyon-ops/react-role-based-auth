@@ -22,3 +22,4 @@ yarn-debug.log*
 yarn-error.log*
 
 react-rb-auth-*.tgz
+.expo/
