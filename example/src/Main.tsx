@@ -66,7 +66,7 @@ export const Main: React.FC = () => {
       isAuthLogic={(user) => !!(user && user.role && user.role)}
     >
       <RefreshApp
-        locationPathName={'none'}
+        locationPathName='none'
         AuthReloadingComp={AuthReloading}
         AuthLoadingComp={AuthLoading}
         onRefreshFinished={() => console.log('Main::onRefreshFinished')}
