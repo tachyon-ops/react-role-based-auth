@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/static/css/main.5da15241.css",
-    "main.js": "/static/js/main.e7cd2d2c.js",
-    "static/media/udilia-logo.svg": "/static/media/udilia-logo.72f63c35fe270129c05c5a49c5585e01.svg",
-    "index.html": "/index.html",
-    "main.5da15241.css.map": "/static/css/main.5da15241.css.map",
-    "main.e7cd2d2c.js.map": "/static/js/main.e7cd2d2c.js.map"
+    "main.css": "/react-role-based-auth/static/css/main.5da15241.css",
+    "main.js": "/react-role-based-auth/static/js/main.55d9ed01.js",
+    "static/media/udilia-logo.svg": "/react-role-based-auth/static/media/udilia-logo.72f63c35fe270129c05c5a49c5585e01.svg",
+    "index.html": "/react-role-based-auth/index.html",
+    "main.5da15241.css.map": "/react-role-based-auth/static/css/main.5da15241.css.map",
+    "main.55d9ed01.js.map": "/react-role-based-auth/static/js/main.55d9ed01.js.map"
   },
   "entrypoints": [
     "static/css/main.5da15241.css",
-    "static/js/main.e7cd2d2c.js"
+    "static/js/main.55d9ed01.js"
   ]
 }
