@@ -1,17 +1,17 @@
-import React from 'react'
-import { Switch, Link } from 'react-router-dom'
+import React from 'react';
+import { Switch, Link } from 'react-router-dom';
 
-import { Example } from './components/Example'
-import { SecureRoute } from './services/SecureRoute'
-import { LoginLogout } from './components/LoginLogout'
-import { SecondExample } from './components/SecondExample'
+import { Example } from './components/Example';
+import { SecureRoute } from './services/SecureRoute';
+import { LoginLogout } from './components/LoginLogout';
+import { SecondExample } from './components/SecondExample';
 
-const AppMenu: React.FC = ({ children }) => <div className='appMenu'>{children}</div>
+const AppMenu: React.FC = ({ children }) => <div className='appMenu'>{children}</div>;
 const AppLink: React.FC<{ to: string; label: string }> = ({ to, label }) => (
   <div className='appLink'>
     <Link to={to}>{label}</Link>
   </div>
-)
+);
 
 export const App: React.FC = () => (
   <>
@@ -35,4 +35,4 @@ export const App: React.FC = () => (
 
     <SecondExample />
   </>
-)
+);

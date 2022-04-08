@@ -1,4 +1,4 @@
-export const DEFAULT_TIMEOUT = 10000
+export const DEFAULT_TIMEOUT = 10000;
 
 export const fetchWithTimeout = (
   requestInfo: RequestInfo,
@@ -6,7 +6,9 @@ export const fetchWithTimeout = (
   timeout = DEFAULT_TIMEOUT
 ): Promise<Response> =>
   Promise.race<Promise<Response>>([
-    fetch(requestInfo, requestInit),
+    fetch(requestInfo, requestInit) as Promise<Response>,
     // eslint-disable-next-line promise/param-names
-    new Promise((_resolve, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
-  ])
+    new Promise((_resolve, reject) =>
+      setTimeout(() => reject(new Error('timeout')), timeout)
+    ) as Promise<Response>,
+  ]);
