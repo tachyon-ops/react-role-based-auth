@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 import * as serviceWorker from './serviceWorker';
 import './index.css';
@@ -10,9 +10,10 @@ const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);
   root.render(
-    <BrowserRouter>
+    // BrowserRouter cannot be used with github pages
+    <HashRouter>
       <Main />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
