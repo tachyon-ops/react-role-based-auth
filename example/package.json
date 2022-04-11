@@ -16,6 +16,7 @@
     "react-rb-auth": "^4.0.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
+    "ts-request-builder": "^0.1.0",
     "typescript": "^4.6.3",
     "web-vitals": "^2.1.4"
   },

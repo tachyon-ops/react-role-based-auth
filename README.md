@@ -10,9 +10,10 @@ First, setup your auth mechanism and backend.
 
 ## Installation
 
-`npm install react-rb-auth`
+ `npm install react-rb-auth`
+
 or
-`yarn add react-rb-auth`
+ `yarn add react-rb-auth`
 
 All library files are located inside **src/lib** folder.
 
@@ -22,7 +23,9 @@ Inside **src/demo** folder, you can test your library while developing.
 
 ### Main and App from example
 
-Our `Main` encapsulates all necessary Auth bootstrapping, including setting the `TokenUtil` storage (this allows implementation decoupling for `localStorage` in browsers or `async storage` in mobile react-native apps), `AuthApi`, `AuthReloading` for when you are reloading the app (refresh), `AuthLoading` for when your are loggin in, and other auth specific utilities.
+Our `Main` encapsulates all necessary Auth bootstrapping, including setting the `TokenUtil` storage (this allows implementation decoupling for `localStorage` in browsers or `async storage` in mobile react-native apps), `AuthApi` , `AuthReloading` for when you are reloading the app (refresh), `AuthLoading` for when your are loggin in, and other auth specific utilities.
+
+Feel free to use [ts-request-builder](https://www.npmjs.com/package/ts-request-builder) to make your APIs easier.
 
 ```typescript
 import React, { useEffect, useState } from 'react'
@@ -118,7 +121,7 @@ Now, in your `App` you can have the following snippet:
 </BrowserRefresh>
 ```
 
-Be sure you imported `import { Switch } from 'react-router-dom';`.
+Be sure you imported `import { Switch } from 'react-router-dom';` .
 
 `BrowserRefresh` logic:
 
@@ -144,7 +147,7 @@ export const BrowserRefresh: React.FC<{
 }
 ```
 
-Then in your `index.tsx` or `app.tsx`, whatever suits you best, under your redux provider, add the following to your react entry poing (`Auth` is our previously created app code):
+Then in your `index.tsx` or `app.tsx` , whatever suits you best, under your redux provider, add the following to your react entry poing ( `Auth` is our previously created app code):
 
 ```typescript
 ReactDOM.render(
@@ -163,7 +166,7 @@ This library supplies you with a context to handle all Authentication state in t
 
 #### Your Auth class and the User model
 
-The context `AuthContext` from `import { AuthContext } from 'react-rb-auth';` has no idea about your specific `UserModel`, so whenever you want to reach your user attributes throughout your codebase, provided `Auth` has been introduced in the DOM tree (usually under your redux store provider), you will need to have the following type casted onto a "custom" `AppAuthContext` of your own:
+The context `AuthContext` from `import { AuthContext } from 'react-rb-auth';` has no idea about your specific `UserModel` , so whenever you want to reach your user attributes throughout your codebase, provided `Auth` has been introduced in the DOM tree (usually under your redux store provider), you will need to have the following type casted onto a "custom" `AppAuthContext` of your own:
 
 ```typescript
 import { AuthContext, RBAuthReactContext } from 'react-rb-auth'
@@ -201,7 +204,7 @@ export const regUser: UserModel = { name: 'Role Based Auth', role: 'admin' }
 
 ### AppAuthContext Types
 
-- You will have to define your own `UserModel` (it follows an example). In this case, `UserModel` is simply an interface `{ name: string, role: AppRole }` (notice the extra `name` in the Object), being `RBAuthUserModel` imported from `react-rb-auth` lib.
+* You will have to define your own `UserModel` (it follows an example). In this case,  `UserModel` is simply an interface `{ name: string, role: AppRole }` (notice the extra `name` in the Object), being `RBAuthUserModel` imported from `react-rb-auth` lib.
 
 ```typescript
 import { RBAuthUserModelWithRole } from 'react-rb-auth'
@@ -218,7 +221,7 @@ export const anonUser: UserModel = {
 }
 ```
 
-`AppRole`:
+`AppRole` :
 
 ```typescript
 import { RBAuthBaseRoles } from 'react-rb-auth'
@@ -226,9 +229,9 @@ import { RBAuthBaseRoles } from 'react-rb-auth'
 export type AppRole = 'writer' | RBAuthBaseRoles
 ```
 
-- typeof rules, where `rules` is of type `RBAuthRulesInterface<AppRole>`
-- `LoginType`, `LogoutType`, `SignupType`, `HandleType`, `SilentType`, `RefreshType` are all the necessary function types for the auth API (look at `AuthApi.ts` file for an example as they are derived from the necessary Tokens and User type this library uses).
-- `GlobalApi` is a dictionary of multiple APIs. While it is still a WIP, it is being developed to allow us to catch any 'unauthorized' loggin in order for the AuthContext to automatically handle the error. You can override this by using your own apis and handling the exceptions yourself, while if the user is not authorized, you just need to log him out yourself.
+* typeof rules, where `rules` is of type `RBAuthRulesInterface<AppRole>`
+* `LoginType`,  `LogoutType`,  `SignupType`,  `HandleType`,  `SilentType`,  `RefreshType` are all the necessary function types for the auth API (look at `AuthApi.ts` file for an example as they are derived from the necessary Tokens and User type this library uses).
+* `GlobalApi` is a dictionary of multiple APIs. While it is still a WIP, it is being developed to allow us to catch any 'unauthorized' loggin in order for the AuthContext to automatically handle the error. You can override this by using your own apis and handling the exceptions yourself, while if the user is not authorized, you just need to log him out yourself.
 
 Now you can use your context like follows, where we combined everything to let you see that even access to `login` and `logout` functionality is in the context. Notice the commented out `Can` usage here.
 
@@ -255,7 +258,7 @@ export const LoginLogout: React.FC = () => (
 
 ## Roles
 
-- [ ] TODO: further implement this. A basic implementation is underway and could be used with `Can` component.
+* [ ] TODO: further implement this. A basic implementation is underway and could be used with `Can` component.
 
 ## Available Scripts
 
@@ -267,7 +270,7 @@ Builds the library code.
 
 ### `yarn start`
 
-Builds the library code (`yarn prepare`), then builds the example app (`yarn predeploy`) and finally it deploys the app to GitHub pages (`yarn deploy`).
+Builds the library code ( `yarn prepare` ), then builds the example app ( `yarn predeploy` ) and finally it deploys the app to GitHub pages ( `yarn deploy` ).
 
 ### Start example
 
@@ -278,7 +281,7 @@ cd example
 npm start # runs create-react-app dev server
 ```
 
-### `yarn test` `yarn test:watch`
+### `yarn test`  `yarn test:watch`
 
 Runs the test watcher in an interactive mode.
 
@@ -292,14 +295,14 @@ Publishes the library to NPM.
 
 Just fork and do a PR :) I will add you to the colaborators list with a BIG thank you!
 
-- If you want to buy me a coffee or a beer as a thank you, I'm very much appreciated :stuck_out_tongue_winking_eye: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D3J2WXTXLAWK8&source=url)
+* If you want to buy me a coffee or a beer as a thank you, I'm very much appreciated :stuck_out_tongue_winking_eye: [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D3J2WXTXLAWK8&source=url)
 
 ## Roadmap
 
 ### TODO list
 
-- [ ] Properly setup Roles
-- [x] ~~RequestBuilder timeout [Fetch with timeout](https://dmitripavlutin.com/timeout-fetch-request/) ~~
+* [ ] Properly setup Roles
+* [x] ~~RequestBuilder timeout [Fetch with timeout](https://dmitripavlutin.com/timeout-fetch-request/) ~~
 
 ### Guidelines
 
@@ -316,9 +319,9 @@ Enjoy!
 
 ### Usage of other libraries within your library
 
-- Add the library as a peer dependency in package.json (effectively requiring the calling project to provide this dependency)
-- Add the library as a dev dependency in package.json (effectively allowing this library to successfully build without complaining about not having this dependency)
-- Add the library to the externals config in your webpack.config file(s). By default, only react and react-dom are there, meaning that those are the only two libraries that you can use within your new shared library.
+* Add the library as a peer dependency in package.json (effectively requiring the calling project to provide this dependency)
+* Add the library as a dev dependency in package.json (effectively allowing this library to successfully build without complaining about not having this dependency)
+* Add the library to the externals config in your webpack.config file(s). By default, only react and react-dom are there, meaning that those are the only two libraries that you can use within your new shared library.
 
 ## Credits
 

@@ -7990,6 +7990,11 @@ tryer@^1.0.1:
   resolved "https://registry.yarnpkg.com/tryer/-/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"
   integrity sha512-c3zayb8/kWWpycWYg87P71E1S1ZL6b6IJxfb5fvsUgsf0S2MVGaDhDXXjDMpdCpfWXqptc+4mXwmiy1ypXqRAA==
 
+ts-request-builder@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ts-request-builder/-/ts-request-builder-0.1.0.tgz#a0a673a6c5c6b9706841c837d477dd8275f704cc"
+  integrity sha512-CSCulbyKj6DqILZWl2xQoQmD/fxAHrnFFFE9czluivN8wxVov1rlPEmP9vP4H3faGfTqEk7Mdni8VvA+lFHp6g==
+
 tsconfig-paths@^3.14.1:
   version "3.14.1"
   resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.14.1.tgz#ba0734599e8ea36c862798e920bcf163277b137a"
